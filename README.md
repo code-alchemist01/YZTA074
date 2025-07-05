@@ -52,6 +52,7 @@ LGS’ ye hazırlanan ADHD, hiperaktivite bozukluğu olan ortaokul öğrencileri
 Tüm proje planlama ve görev takibi süreçlerimizi Trello ve Google Meet üzerinde neredeyse her gün meeting gerçekleştirerek yaptık.
 
 [YZTA074 Trello Backlog Board](https://trello.com/b/PE8u7mp7/yz74-backlog-board)
+
 ![image](https://github.com/user-attachments/assets/0bdc2def-eaaa-4a60-9e73-c00271f787f5)
 
 
