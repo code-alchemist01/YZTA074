@@ -52,6 +52,8 @@ LGS’ ye hazırlanan ADHD, hiperaktivite bozukluğu olan ortaokul öğrencileri
 Tüm proje planlama ve görev takibi süreçlerimizi Trello ve Google Meet üzerinde neredeyse her gün meeting gerçekleştirerek yaptık.
 
 [YZTA074 Trello Backlog Board](https://trello.com/b/PE8u7mp7/yz74-backlog-board)
+![image](https://github.com/user-attachments/assets/0bdc2def-eaaa-4a60-9e73-c00271f787f5)
+
 
 
 # Sprint 1 Raporu
@@ -70,6 +72,10 @@ Sprint İçinde Tamamlanması Tahmin Edilen Puan:10 Puan
 Product Owner olan Kutay, her iki ekiple de yakın bir şekilde çalışarak, ihtiyaç duyulan her noktada destek sağlamakta ve ekipler arasında bilgi akışını koordine etmektedir. Böylece, projenin tüm aşamalarında bütüncül bir yaklaşım benimsenmiş ve ekipler arası iş birliği en üst düzeyde tutulmuştur.
 
 Sprint Board Updates: Sprint sürecinin şeffaf ve verimli bir şekilde yönetilebilmesi amacıyla, tüm görevler ve iş akışları Trello üzerinde oluşturulan Sprint Board üzerinden takip edilmiştir. Sprint Board, projenin mevcut durumunu ve ilerleyişini anlık olarak görmemizi sağlamış, ekip üyeleri arasında görev paylaşımını ve sorumlulukların netleşmesini kolaylaştırmıştır. Görevler, her sprint için öngörülen puan sınırını aşmayacak biçimde dağıtılmıştır.
+
+## Sprint 1 Daily Scrum Meets
+Sürecin büyük kısmını Google Meet üzerinde neredeyse her gün meeting gerçekleştirerek yaptık.
+[Daily Scrum Meets](https://docs.google.com/document/d/14dpRRWSR0RTtUQu9QqKADDhbIHwv9LhxXnHE21a-tqw/edit?usp=sharing)
 
 ## Sprint Review
 * Tüm ekip üyeleri sprint süresince gerçekleştirilen toplantılara eksiksiz katılım sağladı. Proje ve proje gereksinimleri ekipçe kapsamlı bir şekilde gözden geçirildi. Sonraki sprintlerde gerçekleştirilecek görevler belirlendi ve bu görevlerin ekip üyeleri arasında dengeli bir şekilde dağıtılması sağlandı.
