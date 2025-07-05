@@ -28,10 +28,20 @@ zenginleştirilmiş detaylı bir sistem tasarımı sunulmuştur.
 # Projenin Amacı
 MARATHON, ADHD ve hiperaktivite bozukluğu olan ortaokul öğrencilerinin öğrenme süreçlerinde karşılaştıkları odaklanma ve motivasyon zorluklarını en aza indirgemeyi amaçlamaktadır. Bu platform, öğrencilerin dikkat sürelerini artırarak, verimli ve düzenli çalışma alışkanlıkları kazanmalarına destek olur. Aynı zamanda üretken yapay zeka teknolojilerini kullanarak kişiselleştirilmiş öğrenme deneyimleri sunar ve öğrencilerin akademik başarılarını artırmalarına yardımcı olur. Projenin temel hedefi, ADHD’li öğrencilerin eğitim hayatlarında daha etkin, özgüvenli ve başarılı bireyler olarak yer almalarını sağlamaktır.
 
+# Temel Özellikler
+
+
 # Hedef Kitle
 LGS’ ye hazırlanan ADHD, hiperaktivite bozukluğu olan ortaokul öğrencileri ve velileri.
 
 # Kullanılan Teknolojiler
+
+* Yapay Zeka & Makine Öğrenmesi: Gemini, TensorFlow, Scikit-learn
+* Front-end: React / Vue.js
+* Back-end: Python (FastAPI)
+* Veritabanı: MySql
+* Proje Yönetimi: Trello, Google Sheets
+* Versiyon Kontrol: Git & GitHub
 
 # Product Backlog URL
 Tüm proje planlama ve görev takibi süreçlerimizi Trello ve Google Meet üzerinde neredeyse her gün meeting gerçekleştirerek yaptık.
