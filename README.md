@@ -1,7 +1,7 @@
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/4fdadf2c-742c-46c5-af9b-dcb4fe796abe" />
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/a8f551e5-0832-4db2-bf7b-034e0a7d3fae" />
 
-# Ürün İsmi
+# Proje İsmi
 ## Marathon
 
 # Takım İsmi
@@ -29,7 +29,12 @@ zenginleştirilmiş detaylı bir sistem tasarımı sunulmuştur.
 MARATHON, ADHD ve hiperaktivite bozukluğu olan ortaokul öğrencilerinin öğrenme süreçlerinde karşılaştıkları odaklanma ve motivasyon zorluklarını en aza indirgemeyi amaçlamaktadır. Bu platform, öğrencilerin dikkat sürelerini artırarak, verimli ve düzenli çalışma alışkanlıkları kazanmalarına destek olur. Aynı zamanda üretken yapay zeka teknolojilerini kullanarak kişiselleştirilmiş öğrenme deneyimleri sunar ve öğrencilerin akademik başarılarını artırmalarına yardımcı olur. Projenin temel hedefi, ADHD’li öğrencilerin eğitim hayatlarında daha etkin, özgüvenli ve başarılı bireyler olarak yer almalarını sağlamaktır.
 
 # Temel Özellikler
-
+* Kişiselleştirilmiş Çalışma Planları: Öğrencilerin dikkat sürelerine ve bireysel ihtiyaçlarına göre özelleştirilebilen çalışma programları sunar.
+* Odaklanma Modu: Dikkat dağınıklığını en aza indiren, sadeleştirilmiş ve motive edici bir kullanıcı arayüzü ile çalışma ortamı sağlar.
+* Görev ve Hedef Takibi: Öğrenciler, günlük/haftalık hedefler belirleyebilir ve tamamladıkları görevleri kolayca takip edebilirler.
+* Üretken Yapay Zeka Desteği: Gemini API ile entegre edilen yapay zeka, öğrencilere kişiselleştirilmiş öneriler, motivasyon mesajları ve çalışma stratejileri sunar.
+* Bildirim ve Hatırlatıcılar: Çalışma zamanlarını ve molaları hatırlatan akıllı bildirimler ile öğrencilerin düzenli çalışma alışkanlığı kazanmalarına yardımcı olur.
+* İlerleme Analizi ve Raporlama: Öğrencilerin performansını grafikler ve istatistiklerle görselleştirerek gelişimlerini izlemelerini sağlar.
 
 # Hedef Kitle
 LGS’ ye hazırlanan ADHD, hiperaktivite bozukluğu olan ortaokul öğrencileri ve velileri.
