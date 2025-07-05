@@ -75,6 +75,7 @@ Sprint Board Updates: Sprint sürecinin şeffaf ve verimli bir şekilde yönetil
 
 ## Sprint 1 Daily Scrum Meets
 Sürecin büyük kısmını Google Meet üzerinde neredeyse her gün meeting gerçekleştirerek yaptık.
+
 [Daily Scrum Meets](https://docs.google.com/document/d/14dpRRWSR0RTtUQu9QqKADDhbIHwv9LhxXnHE21a-tqw/edit?usp=sharing)
 
 ## Sprint Review
