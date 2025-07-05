@@ -1,5 +1,5 @@
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/4fdadf2c-742c-46c5-af9b-dcb4fe796abe" />
-<img width="400" alt="image" src="https://github.com/user-attachments/assets/a8f551e5-0832-4db2-bf7b-034e0a7d3fae" />
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/001a282e-ffdb-4006-8f0f-08dda10d864e" />
 
 # Proje İsmi
 ## Marathon
