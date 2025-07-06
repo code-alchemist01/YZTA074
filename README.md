@@ -61,9 +61,9 @@ Tüm proje planlama ve görev takibi süreçlerimizi Trello ve Google Meet üzer
 
 Sprint Notları: Sprint sürecine başlamadan önce Trello üzerinde oluşturduğumuz product backlog, üç sprintlik iş yükünü kapsayacak şekilde önceden planlanmıştır. Bu sayede, projenin genel yol haritası netleşmiş ve uzun vadeli hedeflere daha stratejik bir şekilde yaklaşılabilmiştir.
  
-Sprint İçinde Tamamlanması Tahmin Edilen Puan:10 Puan
+Sprint İçinde Tamamlanması Tahmin Edilen Puan:120 Puan
  
-* Puan Tamamlama Mantığı:Proje kapsamında tamamlanması gereken toplam 36 puan bulunmaktadır. Bu puanın üç sprinte bölünmesiyle her bir sprintin yaklaşık 10-12 puanlık iş yüküne bölünmesi uygun görülmüştür. İlk sprintte hedeflenen 10 puan başarıyla tamamlanmıştır.
+* Puan Tamamlama Mantığı:Proje kapsamında tamamlanması gereken toplam 360 puan bulunmaktadır. Bu puanın üç sprinte bölünmesiyle her bir sprintin 12 puanlık iş yüküne bölünmesi uygun görülmüştür. İlk sprintte hedeflenen 120 puan başarıyla tamamlanmıştır.
  
 
 * Daily Scrum Raporları: Proje kapsamında iletişim ve koordinasyonun sağlanabilmesi amacıyla düzenli olarak Whatsapp ve Google Meet platformları üzerinden toplantılar gerçekleştirilmiştir. Takım içi rol dağılımı, önceki formlarda belirtildiği üzere, net bir şekilde belirlenmiştir. Kutay, proje boyunca Product Owner olarak görev almakta; projenin genel vizyonunu belirleme, gereksinimleri toplama ve ekipler arası koordinasyonu sağlama sorumluluğunu üstlenmektedir. Damla ise Scrum Master rolünü üstlenerek, takımın Scrum süreçlerine uygun şekilde çalışmasını, engellerin hızlıca aşılmasını ve takım içi iletişimin etkin bir şekilde yürütülmesini sağlamaktadır.Proje görev dağılımı çerçevesinde iki ana ekip oluşturulmuştur:
