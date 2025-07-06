@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Öğrenci Girişi - ADHD Dostu Platform</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <div class="container">
+        <div class="login-wrapper">
+            <!-- Logo ve Başlık Alanı -->
+            <div class="header-section">
+                <div class="logo">
+                    <img src="Logomuz.jpg" alt="Logo" class="logo-img">
+                </div>
+                <p class="welcome-text">Hoş geldin! Öğrenmeye başlamak için giriş yap.</p>
+            </div>
+
+            <!-- Giriş Formu -->
+            <div class="form-section">
+                <form class="login-form" id="loginForm">
+                    <div class="input-group">
+                        <label for="username" class="input-label">
+                            <span class="label-icon">👤</span>
+                            Kullanıcı Adı
+                        </label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            class="input-field"
+                            placeholder="Kullanıcı adını gir"
+                            required
+                            autocomplete="username"
+                        >
+                        <div class="input-help">Öğretmenin verdiği kullanıcı adını kullan</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password" class="input-label">
+                            <span class="label-icon">🔒</span>
+                            Şifre
+                        </label>
+                        <div class="password-wrapper">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                class="input-field"
+                                placeholder="Şifreni gir"
+                                required
+                                autocomplete="current-password"
+                            >
+                            <button type="button" class="password-toggle" id="passwordToggle">
+                                <span class="toggle-icon">👁️</span>
+                            </button>
+                        </div>
+                        <div class="input-help">Şifreni unutursan öğretmenine sor</div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="login-button">
+                            <span class="button-icon">🚀</span>
+                            Giriş Yap
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Yardım Alanı -->
+            <div class="help-section">
+                <div class="help-card">
+                    <h3 class="help-title">Yardıma mı ihtiyacın var?</h3>
+                    <p class="help-text">Giriş yaparken sorun yaşıyorsan öğretmenine danış.</p>
+                    <button class="help-button">
+                        <span class="button-icon">💬</span>
+                        Yardım Al
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Başarı/Hata Mesajları -->
+        <div class="message-container" id="messageContainer">
+            <div class="message success" id="successMessage">
+                <span class="message-icon">✅</span>
+                <span class="message-text">Giriş başarılı! Yönlendiriliyorsun...</span>
+            </div>
+            <div class="message error" id="errorMessage">
+                <span class="message-icon">❌</span>
+                <span class="message-text">Kullanıcı adı veya şifre hatalı. Tekrar dene.</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+

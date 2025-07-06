@@ -1,0 +1,247 @@
+/* Profile Page Specific Styles */
+
+/* Profile Content */
+.profile-content {
+    padding: 24px;
+    background-color: #f5f5f5;
+    min-height: calc(100vh - 60px);
+}
+
+/* Profile Header */
+.profile-header {
+    background-color: #e8e8e8;
+    padding: 40px 24px;
+    text-align: center;
+    border-radius: 8px;
+    margin-bottom: 24px;
+}
+
+.profile-header h2 {
+    color: #888;
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Profile Main Section */
+.profile-main {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+}
+
+/* Profile Info Section */
+.profile-info {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    min-width: 400px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+/* Profile Avatar */
+.profile-avatar {
+    flex-shrink: 0;
+}
+
+.avatar-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: #d0d0d0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: #888;
+}
+
+/* Profile Details */
+.profile-details {
+    flex: 1;
+}
+
+.profile-name {
+    font-size: 28px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 24px 0;
+}
+
+.profile-field {
+    display: flex;
+    margin-bottom: 16px;
+    align-items: center;
+}
+
+.profile-field label {
+    font-weight: 500;
+    color: #555;
+    min-width: 120px;
+    margin-right: 16px;
+    font-size: 14px;
+}
+
+.profile-field span {
+    color: #333;
+    font-size: 14px;
+}
+
+/* Target Schools Section */
+.target-schools {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex: 0 0 300px;
+    height: fit-content;
+}
+
+.target-schools h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 24px 0;
+}
+
+.schools-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.school-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.school-item:last-child {
+    border-bottom: none;
+}
+
+.school-number {
+    font-weight: 600;
+    color: #666;
+    font-size: 16px;
+    min-width: 24px;
+}
+
+.school-name {
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Active sidebar item for profile page */
+.sidebar .nav-item.active .nav-link {
+    background-color: #f0f0f0;
+    color: #333;
+    font-weight: 600;
+}
+
+.sidebar .nav-item.active .nav-link i {
+    color: #007bff;
+}
+
+/* Responsive Design for Profile Page */
+@media (max-width: 768px) {
+    .profile-content {
+        padding: 16px;
+    }
+    
+    .profile-header {
+        padding: 24px 16px;
+    }
+    
+    .profile-main {
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .profile-info {
+        min-width: auto;
+        flex-direction: column;
+        text-align: center;
+        padding: 24px;
+    }
+    
+    .profile-details {
+        text-align: left;
+    }
+    
+    .target-schools {
+        flex: 1;
+        padding: 24px;
+    }
+    
+    .avatar-circle {
+        width: 100px;
+        height: 100px;
+        font-size: 40px;
+        margin: 0 auto;
+    }
+    
+    .profile-name {
+        font-size: 24px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-field {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .profile-field label {
+        min-width: auto;
+        margin-right: 0;
+        font-weight: 600;
+    }
+    
+    .avatar-circle {
+        width: 80px;
+        height: 80px;
+        font-size: 32px;
+    }
+    
+    .profile-name {
+        font-size: 20px;
+    }
+    
+    .target-schools h3 {
+        font-size: 16px;
+    }
+}
+
+/* Smooth transitions */
+.profile-info,
+.target-schools {
+    transition: box-shadow 0.2s ease;
+}
+
+.profile-info:hover,
+.target-schools:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Loading animation for profile content */
+.profile-content::before {
+    display: none;
+}
+
+.logo-img {
+    max-width: 120px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}

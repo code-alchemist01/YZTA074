@@ -1,0 +1,367 @@
+/* Settings Page Specific Styles */
+
+/* Settings Content */
+.settings-content {
+    padding: 24px;
+    background-color: #f5f5f5;
+    min-height: calc(100vh - 60px);
+}
+
+.settings-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 32px 0;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 24px 0;
+}
+
+/* Settings Section */
+.settings-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+    border: 1px solid #f0f0f0;
+}
+
+/* Form Styles */
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+.input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.input-group i {
+    color: #666;
+    font-size: 16px;
+}
+
+.input-group input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    background-color: #f8f9fa;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #007bff;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.input-group input[readonly] {
+    background-color: #f8f9fa;
+    color: #666;
+    cursor: not-allowed;
+}
+
+.change-btn {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.change-btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+}
+
+.form-select {
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* Notification Settings */
+.notification-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.notification-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.notification-item:hover {
+    border-color: #d0d0d0;
+    background-color: #f8f9fa;
+}
+
+.notification-info {
+    flex: 1;
+}
+
+.notification-info h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 8px 0;
+}
+
+.notification-info p {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-switch label {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.3s;
+    border-radius: 24px;
+}
+
+.toggle-switch label:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + label {
+    background-color: #007bff;
+}
+
+.toggle-switch input:checked + label:before {
+    transform: translateX(26px);
+}
+
+/* Settings Actions */
+.settings-actions {
+    display: flex;
+    justify-content: center;
+    padding: 24px 0;
+}
+
+.save-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.save-btn:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+/* Active sidebar item for settings page */
+.sidebar .nav-item.active .nav-link {
+    background-color: #007bff;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.sidebar .nav-item.active .nav-link i {
+    color: #ffffff;
+}
+
+/* Responsive Design for Settings Page */
+@media (max-width: 768px) {
+    .settings-content {
+        padding: 16px;
+    }
+    
+    .settings-container {
+        max-width: 100%;
+    }
+    
+    .page-title {
+        font-size: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .section-title {
+        font-size: 18px;
+        margin-bottom: 20px;
+    }
+    
+    .settings-section {
+        padding: 24px;
+        margin-bottom: 16px;
+    }
+    
+    .settings-form {
+        gap: 20px;
+    }
+    
+    .notification-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px;
+    }
+    
+    .toggle-switch {
+        align-self: flex-end;
+    }
+    
+    .input-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    
+    .change-btn {
+        align-self: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 18px;
+    }
+    
+    .section-title {
+        font-size: 16px;
+    }
+    
+    .settings-section {
+        padding: 20px;
+    }
+    
+    .notification-item {
+        padding: 14px;
+    }
+    
+    .notification-info h3 {
+        font-size: 15px;
+    }
+    
+    .notification-info p {
+        font-size: 13px;
+    }
+    
+    .save-btn {
+        padding: 12px 24px;
+        font-size: 14px;
+    }
+    
+    .input-group input,
+    .form-select {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+}
+
+/* Smooth animations */
+.settings-section {
+    animation: slideInUp 0.4s ease-out;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Staggered animation for sections */
+.settings-section:nth-child(2) { animation-delay: 0.1s; }
+.settings-section:nth-child(3) { animation-delay: 0.2s; }
+.settings-actions { animation-delay: 0.3s; }
+
+/* Loading animation override for settings content */
+.settings-content::before {
+    display: none;
+}
+
