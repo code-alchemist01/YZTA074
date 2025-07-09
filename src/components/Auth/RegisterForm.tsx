@@ -9,11 +9,13 @@ interface RegisterFormProps {
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({ onRegister, onSwitchToLogin }) => {
   const [formData, setFormData] = useState({
+    username: '',
     firstName: '',
     lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
+    birthDate: '',
     grade: '8',
     adhdType: 'none' as 'none' | 'inattentive' | 'hyperactive' | 'combined',
     learningStyle: [] as string[],
@@ -31,14 +33,28 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onRegister, onSwitch
         throw new Error('Şifreler eşleşmiyor');
       }
 
+      if (!formData.username.trim()) {
+        throw new Error('Kullanıcı adı gerekli');
+      }
+
+      if (formData.username.length < 3) {
+        throw new Error('Kullanıcı adı en az 3 karakter olmalı');
+      }
+
+      if (!formData.birthDate) {
+        throw new Error('Doğum tarihi gerekli');
+      }
+
       if (formData.learningStyle.length === 0) {
         throw new Error('En az bir öğrenme stili seçmelisiniz');
       }
 
-      const user = AuthService.register({
+      const user = await AuthService.register({
+        username: formData.username,
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
+        birthDate: formData.birthDate,
         grade: formData.grade,
         adhdType: formData.adhdType,
         learningStyle: formData.learningStyle,
@@ -108,6 +124,22 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onRegister, onSwitch
             </div>
 
             <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                Kullanıcı Adı
+              </label>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                required
+                value={formData.username}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Benzersiz kullanıcı adınızı girin"
+              />
+            </div>
+
+            <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 E-posta
               </label>
@@ -119,6 +151,22 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onRegister, onSwitch
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700 mb-1">
+                Doğum Tarihi
+              </label>
+              <input
+                id="birthDate"
+                name="birthDate"
+                type="date"
+                required
+                value={formData.birthDate}
+                onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                max={new Date().toISOString().split('T')[0]} // Bugünden sonraki tarih seçilemesin
               />
             </div>
 
@@ -164,9 +212,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onRegister, onSwitch
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="none">ADHD Yok</option>
-                <option value="inattentive">Dikkat Eksikliği</option>
-                <option value="hyperactive">Hiperaktivite</option>
-                <option value="combined">Kombine</option>
+                <option value="dikkat eksikliği">Dikkat Eksikliği</option>
+                <option value="hiperaktivite">Hiperaktivite</option>
+                <option value="ikisi de">Kombine</option>
               </select>
             </div>
 

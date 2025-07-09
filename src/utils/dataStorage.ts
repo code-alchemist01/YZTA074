@@ -1,3 +1,10 @@
+import { ApiService } from '../services/api';
+import { 
+  Dersler, DerslerCreate, 
+  Istatistikler, IstatistiklerCreate,
+  SinavSimilasyonlari, SinavSimilasyonlariCreate 
+} from '../types';
+
 export interface StudySession {
   id: string;
   userId: string;
@@ -33,44 +40,109 @@ export class DataStorage {
   private static readonly STUDY_SESSIONS_KEY = 'marathon_study_sessions';
   private static readonly USER_ACTIVITY_KEY = 'marathon_user_activity';
 
-  static startStudySession(userId: string, type: 'lesson' | 'exam', subject: string, topic: string): string {
-    const sessionId = this.generateId();
-    const session: StudySession = {
-      id: sessionId,
-      userId,
-      type,
-      subject,
-      topic,
-      startTime: new Date(),
-      endTime: new Date(),
-      duration: 0,
-      completed: false,
-    };
+  static async startStudySession(userId: string, type: 'lesson' | 'exam', subject: string, topic: string): Promise<string> {
+    try {
+      const sessionId = this.generateId();
+      const session: StudySession = {
+        id: sessionId,
+        userId,
+        type,
+        subject,
+        topic,
+        startTime: new Date(),
+        endTime: new Date(),
+        duration: 0,
+        completed: false,
+      };
 
-    const sessions = this.getStudySessions();
-    sessions.push(session);
-    localStorage.setItem(this.STUDY_SESSIONS_KEY, JSON.stringify(sessions));
-    
-    return sessionId;
-  }
-
-  static endStudySession(sessionId: string, score?: number, focusScore?: number): void {
-    const sessions = this.getStudySessions();
-    const sessionIndex = sessions.findIndex(s => s.id === sessionId);
-    
-    if (sessionIndex !== -1) {
-      const session = sessions[sessionIndex];
-      session.endTime = new Date();
-      session.duration = Math.round((session.endTime.getTime() - session.startTime.getTime()) / (1000 * 60));
-      session.completed = true;
-      if (score !== undefined) session.score = score;
-      if (focusScore !== undefined) session.focusScore = focusScore;
-      
-      sessions[sessionIndex] = session;
+      // Store locally for immediate access
+      const sessions = this.getStudySessions();
+      sessions.push(session);
       localStorage.setItem(this.STUDY_SESSIONS_KEY, JSON.stringify(sessions));
       
-      // Update user activity
-      this.updateUserActivity(session.userId);
+      // Create corresponding backend entry based on type
+      if (type === 'lesson') {
+        const dersData: DerslerCreate = {
+          ders_adi: `${subject} - ${topic}`,
+          ders_baslangicSaati: session.startTime.toISOString(),
+          ders_tamamlandiMi: 0,
+          ders_tarihi: session.startTime.toISOString().split('T')[0],
+        };
+        
+        try {
+          await ApiService.createDers(dersData);
+        } catch (error) {
+          console.warn('Failed to create lesson in backend:', error);
+        }
+      }
+      
+      return sessionId;
+    } catch (error) {
+      console.error('Error starting study session:', error);
+      // Fallback to local-only storage
+      return this.startLocalStudySession(userId, type, subject, topic);
+    }
+  }
+
+  static async endStudySession(sessionId: string, score?: number, focusScore?: number): Promise<void> {
+    try {
+      const sessions = this.getStudySessions();
+      const sessionIndex = sessions.findIndex(s => s.id === sessionId);
+      
+      if (sessionIndex !== -1) {
+        const session = sessions[sessionIndex];
+        session.endTime = new Date();
+        session.duration = Math.round((session.endTime.getTime() - session.startTime.getTime()) / (1000 * 60));
+        session.completed = true;
+        if (score !== undefined) session.score = score;
+        if (focusScore !== undefined) session.focusScore = focusScore;
+        
+        sessions[sessionIndex] = session;
+        localStorage.setItem(this.STUDY_SESSIONS_KEY, JSON.stringify(sessions));
+        
+        // Update backend
+        await this.syncSessionToBackend(session);
+        
+        // Update user activity
+        await this.updateUserActivity(session.userId);
+      }
+    } catch (error) {
+      console.error('Error ending study session:', error);
+      // Fallback to local-only update
+      this.endLocalStudySession(sessionId, score, focusScore);
+    }
+  }
+
+  private static async syncSessionToBackend(session: StudySession): Promise<void> {
+    try {
+      if (session.type === 'exam' && session.score !== undefined) {
+        // Create exam simulation record
+        const sinavData: SinavSimilasyonlariCreate = {
+          sinav_adi: `${session.subject} - ${session.topic}`,
+          sinav_baslangicSaati: session.startTime.toISOString(),
+          sinav_bitisSaati: session.endTime.toISOString(),
+          sinav_puan: session.score,
+          sinav_tarihi: session.startTime.toISOString().split('T')[0],
+        };
+        
+        await ApiService.createSinav(sinavData);
+      }
+
+      // Create statistics record
+      const today = new Date().toISOString().split('T')[0];
+      const statsData: IstatistiklerCreate = {
+        istatistik_tarihi: today,
+        istatistik_gunlukcalismaSuresi: session.duration,
+        istatistik_tamamlananModulSayisi: session.completed ? 1 : 0,
+        istatistik_ortalamaodakPuani: session.focusScore || 0,
+        istatistik_cozulenSoruSayisi: session.type === 'exam' ? 1 : 0,
+        istatistik_dogruCevapOrani: session.score || 0,
+        ogrenci_id: parseInt(session.userId),
+      };
+      
+      await ApiService.createIstatistik(statsData);
+    } catch (error) {
+      console.warn('Failed to sync session to backend:', error);
     }
   }
 
@@ -88,7 +160,77 @@ export class DataStorage {
     return userId ? convertedSessions.filter(s => s.userId === userId) : convertedSessions;
   }
 
-  static getUserActivity(userId: string): UserActivity {
+  static async getUserActivity(userId: string): Promise<UserActivity> {
+    try {
+      // Try to get fresh data from backend
+      const backendStats = await this.getBackendUserActivity(userId);
+      if (backendStats) {
+        return backendStats;
+      }
+    } catch (error) {
+      console.warn('Failed to get backend user activity, using local data:', error);
+    }
+
+    // Fallback to local calculation
+    return this.getLocalUserActivity(userId);
+  }
+
+  private static async getBackendUserActivity(userId: string): Promise<UserActivity | null> {
+    try {
+      const stats = await ApiService.getIstatistikler(0, 100);
+      const userStats = stats.filter((stat: Istatistikler) => 
+        stat.ogrenci_id === parseInt(userId)
+      );
+
+      if (userStats.length === 0) {
+        return null;
+      }
+
+      // Calculate aggregated data from backend statistics
+      const totalStudyTime = userStats.reduce((total: number, stat: Istatistikler) => 
+        total + (stat.istatistik_gunlukcalismaSuresi || 0), 0
+      );
+
+      const completedLessons = userStats.reduce((total: number, stat: Istatistikler) => 
+        total + (stat.istatistik_tamamlananModulSayisi || 0), 0
+      );
+
+      const completedExams = userStats.reduce((total: number, stat: Istatistikler) => 
+        total + (stat.istatistik_cozulenSoruSayisi || 0), 0
+      );
+
+      const avgScores = userStats
+        .map((stat: Istatistikler) => stat.istatistik_dogruCevapOrani || 0)
+        .filter((score: number) => score > 0);
+      
+      const averageScore = avgScores.length > 0 
+        ? Math.round(avgScores.reduce((a: number, b: number) => a + b, 0) / avgScores.length)
+        : 0;
+
+      // Get local sessions for detailed analysis
+      const sessions = this.getStudySessions(userId);
+      const weeklyActivity = this.calculateWeeklyActivity(sessions);
+      const monthlyActivity = this.calculateMonthlyActivity(sessions);
+      const subjectProgress = this.calculateSubjectProgress(sessions);
+
+      return {
+        userId,
+        studySessions: sessions.filter(s => s.completed),
+        totalStudyTime,
+        completedLessons,
+        completedExams,
+        averageScore,
+        subjectProgress,
+        weeklyActivity,
+        monthlyActivity
+      };
+    } catch (error) {
+      console.error('Error getting backend user activity:', error);
+      return null;
+    }
+  }
+
+  private static getLocalUserActivity(userId: string): UserActivity {
     const sessions = this.getStudySessions(userId);
     const completedSessions = sessions.filter(s => s.completed);
     
@@ -105,9 +247,22 @@ export class DataStorage {
       ? Math.round(examSessions.reduce((total, session) => total + (session.score || 0), 0) / examSessions.length)
       : 0;
     
-    // Calculate subject progress
+    return {
+      userId,
+      studySessions: completedSessions,
+      totalStudyTime,
+      completedLessons,
+      completedExams,
+      averageScore,
+      subjectProgress: this.calculateSubjectProgress(completedSessions),
+      weeklyActivity: this.calculateWeeklyActivity(completedSessions),
+      monthlyActivity: this.calculateMonthlyActivity(completedSessions)
+    };
+  }
+
+  private static calculateSubjectProgress(sessions: StudySession[]): Record<string, any> {
     const subjectProgress: Record<string, any> = {};
-    completedSessions.forEach(session => {
+    sessions.forEach(session => {
       if (!subjectProgress[session.subject]) {
         subjectProgress[session.subject] = {
           totalTime: 0,
@@ -137,7 +292,10 @@ export class DataStorage {
       delete subjectProgress[subject].scores;
     });
     
-    // Calculate weekly activity (last 7 days)
+    return subjectProgress;
+  }
+
+  private static calculateWeeklyActivity(sessions: StudySession[]): Record<string, number> {
     const weeklyActivity: Record<string, number> = {};
     const today = new Date();
     const dayNames = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
@@ -152,15 +310,20 @@ export class DataStorage {
       const dayEnd = new Date(date);
       dayEnd.setHours(23, 59, 59, 999);
       
-      const dayMinutes = completedSessions
+      const dayMinutes = sessions
         .filter(session => session.startTime >= dayStart && session.startTime <= dayEnd)
         .reduce((total, session) => total + session.duration, 0);
       
       weeklyActivity[dayName] = dayMinutes;
     }
     
-    // Calculate monthly activity (last 30 days)
+    return weeklyActivity;
+  }
+
+  private static calculateMonthlyActivity(sessions: StudySession[]): Record<string, number> {
     const monthlyActivity: Record<string, number> = {};
+    const today = new Date();
+    
     for (let i = 29; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
@@ -171,24 +334,53 @@ export class DataStorage {
       const dayEnd = new Date(date);
       dayEnd.setHours(23, 59, 59, 999);
       
-      const dayMinutes = completedSessions
+      const dayMinutes = sessions
         .filter(session => session.startTime >= dayStart && session.startTime <= dayEnd)
         .reduce((total, session) => total + session.duration, 0);
       
       monthlyActivity[dateKey] = dayMinutes;
     }
     
-    return {
+    return monthlyActivity;
+  }
+
+  // Legacy local-only methods for fallback
+  private static startLocalStudySession(userId: string, type: 'lesson' | 'exam', subject: string, topic: string): string {
+    const sessionId = this.generateId();
+    const session: StudySession = {
+      id: sessionId,
       userId,
-      studySessions: completedSessions,
-      totalStudyTime,
-      completedLessons,
-      completedExams,
-      averageScore,
-      subjectProgress,
-      weeklyActivity,
-      monthlyActivity
+      type,
+      subject,
+      topic,
+      startTime: new Date(),
+      endTime: new Date(),
+      duration: 0,
+      completed: false,
     };
+
+    const sessions = this.getStudySessions();
+    sessions.push(session);
+    localStorage.setItem(this.STUDY_SESSIONS_KEY, JSON.stringify(sessions));
+    
+    return sessionId;
+  }
+
+  private static endLocalStudySession(sessionId: string, score?: number, focusScore?: number): void {
+    const sessions = this.getStudySessions();
+    const sessionIndex = sessions.findIndex(s => s.id === sessionId);
+    
+    if (sessionIndex !== -1) {
+      const session = sessions[sessionIndex];
+      session.endTime = new Date();
+      session.duration = Math.round((session.endTime.getTime() - session.startTime.getTime()) / (1000 * 60));
+      session.completed = true;
+      if (score !== undefined) session.score = score;
+      if (focusScore !== undefined) session.focusScore = focusScore;
+      
+      sessions[sessionIndex] = session;
+      localStorage.setItem(this.STUDY_SESSIONS_KEY, JSON.stringify(sessions));
+    }
   }
 
   static getTimeRangeData(userId: string, range: 'week' | 'month' | 'year') {
@@ -198,60 +390,33 @@ export class DataStorage {
     
     switch (range) {
       case 'week':
-        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        startDate = new Date(now);
+        startDate.setDate(now.getDate() - 7);
         break;
       case 'month':
-        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        startDate = new Date(now);
+        startDate.setDate(now.getDate() - 30);
         break;
       case 'year':
-        startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+        startDate = new Date(now);
+        startDate.setFullYear(now.getFullYear() - 1);
         break;
+      default:
+        startDate = new Date(0);
     }
     
-    const filteredSessions = sessions.filter(session => 
-      session.completed && session.startTime >= startDate
-    );
-    
-    const studyTime = filteredSessions.reduce((total, session) => total + session.duration, 0);
-    const lessonsCompleted = filteredSessions.filter(s => s.type === 'lesson').length;
-    const examsCompleted = filteredSessions.filter(s => s.type === 'exam').length;
-    
-    const examSessions = filteredSessions.filter(s => s.type === 'exam' && s.score !== undefined);
-    const averageScore = examSessions.length > 0 
-      ? Math.round(examSessions.reduce((total, session) => total + (session.score || 0), 0) / examSessions.length)
-      : 0;
-    
-    const focusSessions = filteredSessions.filter(s => s.focusScore !== undefined);
-    const focusScore = focusSessions.length > 0
-      ? Math.round(focusSessions.reduce((total, session) => total + (session.focusScore || 0), 0) / focusSessions.length)
-      : 0;
-    
-    return {
-      studyTime,
-      lessonsCompleted,
-      examsCompleted,
-      averageScore,
-      focusScore
-    };
+    return sessions.filter(session => session.startTime >= startDate);
   }
 
-  private static updateUserActivity(userId: string): void {
-    const activity = this.getUserActivity(userId);
-    const activities = this.getAllUserActivities();
-    const existingIndex = activities.findIndex(a => a.userId === userId);
-    
-    if (existingIndex !== -1) {
-      activities[existingIndex] = activity;
-    } else {
-      activities.push(activity);
+  private static async updateUserActivity(userId: string): Promise<void> {
+    // This method is now primarily handled by syncSessionToBackend
+    // but we keep it for compatibility
+    try {
+      const activity = await this.getUserActivity(userId);
+      localStorage.setItem(`${this.USER_ACTIVITY_KEY}_${userId}`, JSON.stringify(activity));
+    } catch (error) {
+      console.warn('Failed to update user activity:', error);
     }
-    
-    localStorage.setItem(this.USER_ACTIVITY_KEY, JSON.stringify(activities));
-  }
-
-  private static getAllUserActivities(): UserActivity[] {
-    const activities = localStorage.getItem(this.USER_ACTIVITY_KEY);
-    return activities ? JSON.parse(activities) : [];
   }
 
   private static generateId(): string {

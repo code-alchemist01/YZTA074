@@ -13,10 +13,37 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
   const [timeRangeData, setTimeRangeData] = useState<any>(null);
 
   useEffect(() => {
-    const activity = DataStorage.getUserActivity(user.id);
-    const rangeData = DataStorage.getTimeRangeData(user.id, timeRange);
-    setUserActivity(activity);
-    setTimeRangeData(rangeData);
+    const loadData = async () => {
+      try {
+        const activity = await DataStorage.getUserActivity(user.id);
+        const rangeData = DataStorage.getTimeRangeData(user.id, timeRange);
+        setUserActivity(activity);
+        setTimeRangeData(rangeData);
+      } catch (error) {
+        console.error('Error loading analytics data:', error);
+        // Set empty data to show no data state
+        setUserActivity({
+          userId: user.id,
+          studySessions: [],
+          totalStudyTime: 0,
+          completedLessons: 0,
+          completedExams: 0,
+          averageScore: 0,
+          subjectProgress: {},
+          weeklyActivity: {},
+          monthlyActivity: {}
+        });
+        setTimeRangeData({
+          studyTime: 0,
+          lessonsCompleted: 0,
+          examsCompleted: 0,
+          averageScore: 0,
+          focusScore: 0
+        });
+      }
+    };
+    
+    loadData();
   }, [user.id, timeRange]);
 
   const formatTime = (minutes: number) => {
