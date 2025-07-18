@@ -116,20 +116,26 @@ Projenin son durumunu gösteren fotoğraflar Google Drive üzerinde depolanmış
 
 [Project View](https://drive.google.com/drive/folders/1fJCsZKqqchfcUC4ePcwOKe8qU3Vjc_OV?usp=sharing)
 
-## Sprint Review
+## Sprint Review – Sprint 2
+Sprint 2'nin sonunda ekip üyeleriyle bir araya gelinerek Sprint Review toplantısı gerçekleştirilmiştir. Bu sprintte belirlenen tüm hedeflere başarıyla ulaşılmıştır.
 
-Sprint 2'nin sonunda ekip ile toplanılmış ve Sprint gözden geçirilmiştir. 2. Sprint içerisinde istenilen tüm amaçlara ulaşılmıştır.
+Sprint Review Katılımcıları:
+İbrahim Kutay Şahin, Bedirhan Örseloğlu, Kerem Akkale, Hidayet Sare Budak, Damla Nur Özcan
 
-Sprint Review katılımcıları: İbrahim Kutay Şahin, Bedirhan Örseloğlu, Kerem AkkaleHidayet Sare Budak, Damla Nur Özcan.
+##Sprint Retrospective – Sprint 2
+Toplam Puan: 120
 
-## Sprint Retrospective:
-Sprint 2 için alınan puan 120'dir. 
-Takım üyelerinin gelecek sprintlerde daha aktif olması gerektiğine vurgu yapılmıştır.
-Veri tabanı ve backend tarafındaki görevlerin azalması nedeniyle frontend kısmında çalışmaya yönelinmiştir.
-Homepage sayfası hazırlanmıştır.
-Backend ve database bağlantıları sağlanmıştır.
-İlk sprintte hazırlanan taslaklar düzeltilmiştir.
-Kullanıcı arayüzü ile ilgili geliştirmeler yapılmıştır.
+Sprint süresince ekip, hedeflenen görevleri tamamlamış ve projenin önemli bir kısmında ilerleme kaydetmiştir. Gelecek sprintler için ekip üyelerinin daha proaktif olması gerektiği vurgulanmıştır.
 
+Bu sprintte, veritabanı ve arka uç (backend) geliştirmelerinin büyük oranda tamamlanması nedeniyle, ağırlıklı olarak ön uç (frontend) geliştirmelerine odaklanılmıştır. Bu kapsamda şu çalışmalar gerçekleştirilmiştir:
 
+Ana sayfa (Homepage) tasarlanıp uygulanmıştır.
+
+Ana sayfaya, kullanıcı profilindeki sohbet botundan farklı olarak; paketler ve Marathon platformu hakkında bilgi verebilen ayrı bir sohbet botu entegre edilmiştir.
+
+Backend kodlaması tamamlanmış, veritabanı bağlantıları başarıyla kurulmuştur.
+
+İlk sprintte hazırlanan taslaklar gözden geçirilmiş ve iyileştirilmiştir.
+
+Kullanıcı arayüzü üzerinde çeşitli geliştirmeler yapılmıştır.
 
