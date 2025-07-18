@@ -111,4 +111,25 @@ Tüm proje planlama ve görev takibi süreçlerimizi Trello ve Google Meet üzer
 
 <img width="1505" height="773" alt="Screenshot 2025-07-19 at 01 45 56" src="https://github.com/user-attachments/assets/aa35430b-3b5f-45b9-ad1c-5a799e776455" />
 
+# Projenin Son Durumu 
+Projenin son durumunu gösteren fotoğraflar Google Drive üzerinde depolanmıştır.
+[project view](https://drive.google.com/drive/folders/1fJCsZKqqchfcUC4ePcwOKe8qU3Vjc_OV?usp=sharing)
+
+## Sprint Review
+
+Sprint 2'nin sonunda ekip ile toplanılmış ve Sprint gözden geçirilmiştir. 2. Sprint içerisinde istenilen tüm amaçlara ulaşılmıştır.
+
+Sprint Review katılımcıları: İbrahim Kutay Şahin, Bedirhan Örseloğlu, Kerem AkkaleHidayet Sare Budak, Damla Nur Özcan.
+
+## Sprint Retrospective:
+Sprint 2 için alınan puan 120'dir. 
+Takım üyelerinin gelecek sprintlerde daha aktif olması gerektiğine vurgu yapılmıştır.
+Veri tabanı ve backend tarafındaki görevlerin azalması nedeniyle frontend kısmında çalışmaya yönelinmiştir.
+Homepage sayfası hazırlanmıştır.
+Backend ve database bağlantıları sağlanmıştır.
+İlk sprintte hazırlanan taslaklar düzeltilmiştir.
+Kullanıcı arayüzü ile ilgili geliştirmeler yapılmıştır.
+<img width="468" height="351" alt="image" src="https://github.com/user-attachments/assets/d7641a8f-1299-41a1-aff1-60a4f057719c" />
+
+
 
