@@ -122,7 +122,7 @@ Sprint 2'nin sonunda ekip üyeleriyle bir araya gelinerek Sprint Review toplant�
 Sprint Review Katılımcıları:
 İbrahim Kutay Şahin, Bedirhan Örseloğlu, Kerem Akkale, Hidayet Sare Budak, Damla Nur Özcan
 
-##Sprint Retrospective – Sprint 2
+## Sprint Retrospective – Sprint 2
 Toplam Puan: 120
 
 Sprint süresince ekip, hedeflenen görevleri tamamlamış ve projenin önemli bir kısmında ilerleme kaydetmiştir. Gelecek sprintler için ekip üyelerinin daha proaktif olması gerektiği vurgulanmıştır.
