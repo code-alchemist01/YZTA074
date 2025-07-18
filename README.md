@@ -129,7 +129,6 @@ Homepage sayfası hazırlanmıştır.
 Backend ve database bağlantıları sağlanmıştır.
 İlk sprintte hazırlanan taslaklar düzeltilmiştir.
 Kullanıcı arayüzü ile ilgili geliştirmeler yapılmıştır.
-<img width="468" height="351" alt="image" src="https://github.com/user-attachments/assets/d7641a8f-1299-41a1-aff1-60a4f057719c" />
 
 
 
