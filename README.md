@@ -102,7 +102,7 @@ Sprint İçinde Tamamlanması Tahmin Edilen Puan:120 Puan
 
 Daily Scrum: Daily Scrum toplantıları genel olarak Goodle Meet ve whatsapp üzerinden devam etmiştir. Her hafta bir çok toplantı yapılmıştır. Whatsapp üzerinde proje üzerinde yaptığımız çalışmalar ekip üyeleri tarafından aktif olarak paylaşılmıştır.
 
-[Daily Scrum Meets](https://docs.google.com/document/d/14dpRRWSR0RTtUQu9QqKADDhbIHwv9LhxXnHE21a-tqw/edit?usp=sharing)
+[Daily Scrum Meets]()
 
 # Product Backlog URL - Sprint 2
 Tüm proje planlama ve görev takibi süreçlerimizi Trello ve Google Meet üzerinde neredeyse her gün meeting gerçekleştirerek yaptık.
