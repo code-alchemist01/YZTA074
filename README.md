@@ -96,7 +96,7 @@ Geliştirilmesi Gereken Yönlerimiz
 
 * Zaman yönetimi konusunda daha disiplinli ve verimli bir yaklaşım benimsememiz gerekmektedir.
 
-# Sprint 2 Raporu
+# Sprint 2 
 
 Sprint İçinde Tamamlanması Tahmin Edilen Puan:120 Puan
 
