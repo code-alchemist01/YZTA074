@@ -107,13 +107,14 @@ Daily Scrum: Daily Scrum toplantıları genel olarak Goodle Meet ve whatsapp üz
 # Product Backlog URL - Sprint 2
 Tüm proje planlama ve görev takibi süreçlerimizi Trello ve Google Meet üzerinde neredeyse her gün meeting gerçekleştirerek yaptık.
 
-[YZTA074 Trello Backlog Board](https://trello.com/b/PE8u7mp7/yz74-backlog-board)
+[YZTA074 Trello Backlog Board - Sprint 2](https://trello.com/b/PE8u7mp7/yz74-backlog-board)
 
 <img width="1505" height="773" alt="Screenshot 2025-07-19 at 01 45 56" src="https://github.com/user-attachments/assets/aa35430b-3b5f-45b9-ad1c-5a799e776455" />
 
 # Projenin Son Durumu 
 Projenin son durumunu gösteren fotoğraflar Google Drive üzerinde depolanmıştır.
-[project view](https://drive.google.com/drive/folders/1fJCsZKqqchfcUC4ePcwOKe8qU3Vjc_OV?usp=sharing)
+
+[Project View](https://drive.google.com/drive/folders/1fJCsZKqqchfcUC4ePcwOKe8qU3Vjc_OV?usp=sharing)
 
 ## Sprint Review
 
