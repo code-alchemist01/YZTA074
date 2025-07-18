@@ -95,3 +95,20 @@ Geliştirilmesi Gereken Yönlerimiz
 * Teknik bilgi eksikliklerimizi gidermek için bireysel ve ekip içi gelişim çalışmalarına ağırlık vermeliyiz.
 
 * Zaman yönetimi konusunda daha disiplinli ve verimli bir yaklaşım benimsememiz gerekmektedir.
+
+# Sprint 2 Raporu
+
+Sprint İçinde Tamamlanması Tahmin Edilen Puan:120 Puan
+
+Daily Scrum: Daily Scrum toplantıları genel olarak Goodle Meet ve whatsapp üzerinden devam etmiştir. Her hafta bir çok toplantı yapılmıştır. Whatsapp üzerinde proje üzerinde yaptığımız çalışmalar ekip üyeleri tarafından aktif olarak paylaşılmıştır.
+
+[Daily Scrum Meets](https://docs.google.com/document/d/14dpRRWSR0RTtUQu9QqKADDhbIHwv9LhxXnHE21a-tqw/edit?usp=sharing)
+
+# Product Backlog URL - Sprint 2
+Tüm proje planlama ve görev takibi süreçlerimizi Trello ve Google Meet üzerinde neredeyse her gün meeting gerçekleştirerek yaptık.
+
+[YZTA074 Trello Backlog Board](https://trello.com/b/PE8u7mp7/yz74-backlog-board)
+
+<img width="1505" height="773" alt="Screenshot 2025-07-19 at 01 45 56" src="https://github.com/user-attachments/assets/aa35430b-3b5f-45b9-ad1c-5a799e776455" />
+
+
