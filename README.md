@@ -98,12 +98,11 @@ Geliştirilmesi Gereken Yönlerimiz
 
 # Sprint 2 
 
-Sprint Notları : İkinci sprint sürecinde ekip olarak zaman zaman iletişim kopuklukları yaşanmış olsa da, bu durum kısa sürede telafi edilmiş ve ekip yeniden birlikte hareket etmeye başlamıştır. Bu süreç, ekip olarak birlikte çalışma ve topluluk halinde üretme becerimizin gelişmesini sağlamıştır. Ayrıca, yaşanan iletişim sorunlarını tespit ederek çözüm üretme noktasında önemli deneyimler kazanılmıştır.
+* Sprint Notları : İkinci sprint sürecinde ekip olarak zaman zaman iletişim kopuklukları yaşanmış olsa da, bu durum kısa sürede telafi edilmiş ve ekip yeniden birlikte hareket etmeye başlamıştır. Bu süreç, ekip olarak birlikte çalışma ve topluluk halinde üretme becerimizin gelişmesini sağlamıştır. Ayrıca, yaşanan iletişim sorunlarını tespit ederek çözüm üretme noktasında önemli deneyimler kazanılmıştır.
 
 
-Sprint İçinde Tamamlanması Tahmin Edilen Puan:120 Puan
+* Daily Scrum toplantıları ağırlıklı olarak Google Meet ve WhatsApp platformları üzerinden gerçekleştirilmiştir. Her hafta düzenli olarak birden fazla toplantı yapılmış ve proje süreci boyunca ekip üyeleri aktif bir şekilde iletişim halinde kalmıştır. WhatsApp grubu, proje kapsamında yapılan çalışmaların paylaşılması ve anlık bilgilendirme için etkin biçimde kullanılmıştır.
 
-Daily Scrum toplantıları ağırlıklı olarak Google Meet ve WhatsApp platformları üzerinden gerçekleştirilmiştir. Her hafta düzenli olarak birden fazla toplantı yapılmış ve proje süreci boyunca ekip üyeleri aktif bir şekilde iletişim halinde kalmıştır. WhatsApp grubu, proje kapsamında yapılan çalışmaların paylaşılması ve anlık bilgilendirme için etkin biçimde kullanılmıştır.
 
 [Daily Scrum Meets]()
 
@@ -120,12 +119,8 @@ Projenin son durumunu gösteren fotoğraflar Google Drive üzerinde depolanmış
 [Project View](https://drive.google.com/drive/folders/1fJCsZKqqchfcUC4ePcwOKe8qU3Vjc_OV?usp=sharing)
 
 ## Sprint Review 
-Sprint 2'nin sonunda ekip üyeleriyle bir araya gelinerek Sprint Review toplantısı gerçekleştirilmiştir. Bu sprintte belirlenen tüm hedeflere başarıyla ulaşılmıştır.
+* Sprint 2'nin sonunda ekip üyeleriyle bir araya gelinerek Sprint Review toplantısı gerçekleştirilmiştir. Bu sprintte belirlenen tüm hedeflere başarıyla ulaşılmıştır.
 
-Sprint Review Aktif Katılımcıları:
-İbrahim Kutay Şahin, Bedirhan Örseloğlu, Kerem Akkale, Hidayet Sare Budak, Damla Nur Özcan
-
-## Sprint Retrospective 
 Toplam Puan: 120
 
 * Sprint süresince ekip, hedeflenen görevleri tamamlamış ve projenin önemli bir kısmında ilerleme kaydetmiştir. Gelecek sprintler için ekip üyelerinin daha proaktif olması gerektiği vurgulanmıştır.
@@ -141,4 +136,27 @@ Toplam Puan: 120
 * İlk sprintte hazırlanan taslaklar gözden geçirilmiş ve iyileştirilmiştir.
 
 * Kullanıcı arayüzü üzerinde çeşitli geliştirmeler yapılmıştır.
+
+* Sprint Review Aktif Katılımcıları:
+İbrahim Kutay Şahin, Bedirhan Örseloğlu, Kerem Akkale, Hidayet Sare Budak, Damla Nur Özcan
+
+## Sprint Retrospective 
+
+Güçlü Yönlerimiz
+
+* Ekip içi iletişim sorunlarına rağmen hızlıca toparlanarak birlikte çalışma becerimizi güçlendirdik.
+
+* Daily Scrum toplantıları düzenli ve verimli şekilde Google Meet ve WhatsApp üzerinden yürütüldü.
+
+* Backend geliştirmeleri tamamlandı, veritabanı bağlantıları kuruldu ve ön uç geliştirmelerine odaklanıldı.
+
+* Sprint hedeflerine başarıyla ulaşıldı, görevler zamanında tamamlandı.
+
+Geliştirilmesi Gereken Yönlerimiz
+
+* İletişim kopukluklarının tekrarını önlemek için daha düzenli iletişim kurulmalı.
+
+* Ekip üyeleri, gelecek sprintlerde daha proaktif ve zaman yönetimi konusunda daha dikkatli olmalı.
+
+
 
