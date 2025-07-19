@@ -34,7 +34,7 @@ MARATHON, ADHD ve hiperaktivite bozukluğu olan ortaokul öğrencilerinin öğre
 * Görev ve Hedef Takibi: Öğrenciler, günlük/haftalık hedefler belirleyebilir ve tamamladıkları görevleri kolayca takip edebilirler.
 * Üretken Yapay Zeka Desteği: Gemini API ile entegre edilen yapay zeka, öğrencilere kişiselleştirilmiş öneriler, motivasyon mesajları ve çalışma stratejileri sunar.
 * Bildirim ve Hatırlatıcılar: Çalışma zamanlarını ve molaları hatırlatan akıllı bildirimler ile öğrencilerin düzenli çalışma alışkanlığı kazanmalarına yardımcı olur.
-* İlerleme Analizi ve Raporlama: Öğrencilerin performansını grafikler ve istatistiklerle görselleştirerek gelişimlerini izlemelerini sağlar.
+* İlerleme Analizi ve Raporlama: Öğrencilerin performansını grafikler ve istatistiklerle görselleştirerek gelişimlerini izlemelerini sağlar.
 
 # Hedef Kitle
 LGS’ ye hazırlanan ADHD, hiperaktivite bozukluğu olan ortaokul öğrencileri ve velileri.
@@ -94,4 +94,68 @@ Geliştirilmesi Gereken Yönlerimiz
 
 * Teknik bilgi eksikliklerimizi gidermek için bireysel ve ekip içi gelişim çalışmalarına ağırlık vermeliyiz.
 
-* Zaman yönetimi konusunda daha disiplinli ve verimli bir yaklaşım benimsememiz gerekmektedir.
+* Zaman yönetimi konusunda daha disiplinli ve verimli bir yaklaşım benimsememiz gerekmektedir.
+
+# Sprint 2 
+
+Sprint Notları : İkinci sprint sürecinde ekip olarak zaman zaman iletişim kopuklukları yaşanmış olsa da, bu durum kısa sürede telafi edilmiş ve ekip yeniden birlikte hareket etmeye başlamıştır. Bu süreç, ekip olarak birlikte çalışma ve topluluk halinde üretme becerimizin gelişmesini sağlamıştır. Ayrıca, yaşanan iletişim sorunlarını tespit ederek çözüm üretme noktasında önemli deneyimler kazanılmıştır.
+
+
+Daily Scrum toplantıları ağırlıklı olarak Google Meet ve WhatsApp platformları üzerinden gerçekleştirilmiştir. Her hafta düzenli olarak birden fazla toplantı yapılmış ve proje süreci boyunca ekip üyeleri aktif bir şekilde iletişim halinde kalmıştır. WhatsApp grubu, proje kapsamında yapılan çalışmaların paylaşılması ve anlık bilgilendirme için etkin biçimde kullanılmıştır.
+
+
+[Daily Scrum Meets]()
+
+# Product Backlog URL
+Tüm proje planlama ve görev takibi süreçlerimizi Trello ve Google Meet üzerinde meeting gerçekleştirerek yaptık.
+
+[YZTA074 Trello Backlog Board - Sprint 2](https://trello.com/b/PE8u7mp7/yz74-backlog-board)
+
+<img width="1505" height="773" alt="Screenshot 2025-07-19 at 01 45 56" src="https://github.com/user-attachments/assets/aa35430b-3b5f-45b9-ad1c-5a799e776455" />
+
+# Projenin Son Durumu 
+Projenin son durumunu gösteren fotoğraflar Google Drive üzerinde depolanmıştır.
+
+[Project View](https://drive.google.com/drive/folders/1fJCsZKqqchfcUC4ePcwOKe8qU3Vjc_OV?usp=sharing)
+
+## Sprint Review 
+Sprint 2'nin sonunda ekip üyeleriyle bir araya gelinerek Sprint Review toplantısı gerçekleştirilmiştir. Bu sprintte belirlenen tüm hedeflere başarıyla ulaşılmıştır.
+
+Toplam Puan: 120
+
+* Sprint süresince ekip, hedeflenen görevleri tamamlamış ve projenin önemli bir kısmında ilerleme kaydetmiştir. Gelecek sprintler için ekip üyelerinin daha proaktif olması gerektiği vurgulanmıştır.
+
+* Bu sprintte, veritabanı ve arka uç (backend) geliştirmelerinin büyük oranda tamamlanması nedeniyle, ağırlıklı olarak ön uç (frontend) geliştirmelerine odaklanılmıştır. Bu kapsamda şu çalışmalar gerçekleştirilmiştir:
+
+* Ana sayfa (Homepage) tasarlanıp uygulanmıştır.
+
+* Ana sayfaya, kullanıcı profilindeki sohbet botundan farklı olarak; paketler ve Marathon platformu hakkında bilgi verebilen ayrı bir sohbet botu entegre edilmiştir.
+
+* Backend kodlaması tamamlanmış, veritabanı bağlantıları başarıyla kurulmuştur.
+
+* İlk sprintte hazırlanan taslaklar gözden geçirilmiş ve iyileştirilmiştir.
+
+* Kullanıcı arayüzü üzerinde çeşitli geliştirmeler yapılmıştır.
+
+Sprint Review Aktif Katılımcıları:
+İbrahim Kutay Şahin, Bedirhan Örseloğlu, Kerem Akkale, Hidayet Sare Budak, Damla Nur Özcan
+
+## Sprint Retrospective 
+
+Güçlü Yönlerimiz
+
+* Ekip içi iletişim sorunlarına rağmen hızlıca toparlanarak birlikte çalışma becerimizi güçlendirdik.
+
+* Daily Scrum toplantıları düzenli ve verimli şekilde Google Meet ve WhatsApp üzerinden yürütüldü.
+
+* Backend geliştirmeleri tamamlandı, veritabanı bağlantıları kuruldu ve ön uç geliştirmelerine odaklanıldı.
+
+* Sprint hedeflerine başarıyla ulaşıldı, görevler zamanında tamamlandı.
+
+Geliştirilmesi Gereken Yönlerimiz
+
+* İletişim kopukluklarının tekrarını önlemek için daha düzenli iletişim kurulmalı.
+
+* Ekip üyeleri, gelecek sprintlerde daha proaktif ve zaman yönetimi konusunda daha dikkatli olmalı.
+
+
