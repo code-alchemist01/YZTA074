@@ -104,7 +104,7 @@ Daily Scrum: Daily Scrum toplantıları genel olarak Goodle Meet ve whatsapp üz
 
 [Daily Scrum Meets]()
 
-# Product Backlog URL - Sprint 2
+# Product Backlog URL
 Tüm proje planlama ve görev takibi süreçlerimizi Trello ve Google Meet üzerinde neredeyse her gün meeting gerçekleştirerek yaptık.
 
 [YZTA074 Trello Backlog Board - Sprint 2](https://trello.com/b/PE8u7mp7/yz74-backlog-board)
@@ -116,13 +116,13 @@ Projenin son durumunu gösteren fotoğraflar Google Drive üzerinde depolanmış
 
 [Project View](https://drive.google.com/drive/folders/1fJCsZKqqchfcUC4ePcwOKe8qU3Vjc_OV?usp=sharing)
 
-## Sprint Review – Sprint 2
+## Sprint Review 
 Sprint 2'nin sonunda ekip üyeleriyle bir araya gelinerek Sprint Review toplantısı gerçekleştirilmiştir. Bu sprintte belirlenen tüm hedeflere başarıyla ulaşılmıştır.
 
 Sprint Review Katılımcıları:
 İbrahim Kutay Şahin, Bedirhan Örseloğlu, Kerem Akkale, Hidayet Sare Budak, Damla Nur Özcan
 
-## Sprint Retrospective – Sprint 2
+## Sprint Retrospective 
 Toplam Puan: 120
 
 Sprint süresince ekip, hedeflenen görevleri tamamlamış ve projenin önemli bir kısmında ilerleme kaydetmiştir. Gelecek sprintler için ekip üyelerinin daha proaktif olması gerektiği vurgulanmıştır.
