@@ -104,7 +104,7 @@ Sprint Notları : İkinci sprint sürecinde ekip olarak zaman zaman iletişim ko
 Daily Scrum toplantıları ağırlıklı olarak Google Meet ve WhatsApp platformları üzerinden gerçekleştirilmiştir. Her hafta düzenli olarak birden fazla toplantı yapılmış ve proje süreci boyunca ekip üyeleri aktif bir şekilde iletişim halinde kalmıştır. WhatsApp grubu, proje kapsamında yapılan çalışmaların paylaşılması ve anlık bilgilendirme için etkin biçimde kullanılmıştır.
 
 
-[Daily Scrum Meets]()
+[Daily Scrum Meets](https://docs.google.com/document/d/18odIN2Pgm2zCmM5FsSFV5CnoeNdRKEF7bPJG9RXSM_U/edit?usp=sharing)
 
 # Product Backlog URL
 Tüm proje planlama ve görev takibi süreçlerimizi Trello ve Google Meet üzerinde meeting gerçekleştirerek yaptık.
@@ -145,9 +145,6 @@ Sprint Review Aktif Katılımcıları:
 Güçlü Yönlerimiz
 
 * Ekip içi iletişim sorunlarına rağmen hızlıca toparlanarak birlikte çalışma becerimizi güçlendirdik.
-
-* Daily Scrum toplantıları düzenli ve verimli şekilde Google Meet ve WhatsApp üzerinden yürütüldü.
-
 * Backend geliştirmeleri tamamlandı, veritabanı bağlantıları kuruldu ve ön uç geliştirmelerine odaklanıldı.
 
 * Sprint hedeflerine başarıyla ulaşıldı, görevler zamanında tamamlandı.
@@ -155,6 +152,9 @@ Güçlü Yönlerimiz
 Geliştirilmesi Gereken Yönlerimiz
 
 * İletişim kopukluklarının tekrarını önlemek için daha düzenli iletişim kurulmalı.
+
+
+* Daily Scrum toplantıları düzenli ve verimli şekilde Google Meet ve WhatsApp üzerinden yürütüldü.
 
 * Ekip üyeleri, gelecek sprintlerde daha proaktif ve zaman yönetimi konusunda daha dikkatli olmalı.
 
