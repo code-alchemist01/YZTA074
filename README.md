@@ -119,7 +119,7 @@ Projenin son durumunu gösteren fotoğraflar Google Drive üzerinde depolanmış
 [Project View](https://drive.google.com/drive/folders/1fJCsZKqqchfcUC4ePcwOKe8qU3Vjc_OV?usp=sharing)
 
 ## Sprint Review 
-* Sprint 2'nin sonunda ekip üyeleriyle bir araya gelinerek Sprint Review toplantısı gerçekleştirilmiştir. Bu sprintte belirlenen tüm hedeflere başarıyla ulaşılmıştır.
+Sprint 2'nin sonunda ekip üyeleriyle bir araya gelinerek Sprint Review toplantısı gerçekleştirilmiştir. Bu sprintte belirlenen tüm hedeflere başarıyla ulaşılmıştır.
 
 Toplam Puan: 120
 
