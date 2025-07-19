@@ -98,10 +98,10 @@ Geliştirilmesi Gereken Yönlerimiz
 
 # Sprint 2 
 
-* Sprint Notları : İkinci sprint sürecinde ekip olarak zaman zaman iletişim kopuklukları yaşanmış olsa da, bu durum kısa sürede telafi edilmiş ve ekip yeniden birlikte hareket etmeye başlamıştır. Bu süreç, ekip olarak birlikte çalışma ve topluluk halinde üretme becerimizin gelişmesini sağlamıştır. Ayrıca, yaşanan iletişim sorunlarını tespit ederek çözüm üretme noktasında önemli deneyimler kazanılmıştır.
+Sprint Notları : İkinci sprint sürecinde ekip olarak zaman zaman iletişim kopuklukları yaşanmış olsa da, bu durum kısa sürede telafi edilmiş ve ekip yeniden birlikte hareket etmeye başlamıştır. Bu süreç, ekip olarak birlikte çalışma ve topluluk halinde üretme becerimizin gelişmesini sağlamıştır. Ayrıca, yaşanan iletişim sorunlarını tespit ederek çözüm üretme noktasında önemli deneyimler kazanılmıştır.
 
 
-* Daily Scrum toplantıları ağırlıklı olarak Google Meet ve WhatsApp platformları üzerinden gerçekleştirilmiştir. Her hafta düzenli olarak birden fazla toplantı yapılmış ve proje süreci boyunca ekip üyeleri aktif bir şekilde iletişim halinde kalmıştır. WhatsApp grubu, proje kapsamında yapılan çalışmaların paylaşılması ve anlık bilgilendirme için etkin biçimde kullanılmıştır.
+Daily Scrum toplantıları ağırlıklı olarak Google Meet ve WhatsApp platformları üzerinden gerçekleştirilmiştir. Her hafta düzenli olarak birden fazla toplantı yapılmış ve proje süreci boyunca ekip üyeleri aktif bir şekilde iletişim halinde kalmıştır. WhatsApp grubu, proje kapsamında yapılan çalışmaların paylaşılması ve anlık bilgilendirme için etkin biçimde kullanılmıştır.
 
 
 [Daily Scrum Meets]()
