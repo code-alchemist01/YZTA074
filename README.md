@@ -100,12 +100,14 @@ Geliştirilmesi Gereken Yönlerimiz
 
 Sprint İçinde Tamamlanması Tahmin Edilen Puan:120 Puan
 
-Daily Scrum: Daily Scrum toplantıları genel olarak Goodle Meet ve whatsapp üzerinden devam etmiştir. Her hafta bir çok toplantı yapılmıştır. Whatsapp üzerinde proje üzerinde yaptığımız çalışmalar ekip üyeleri tarafından aktif olarak paylaşılmıştır.
+Daily Scrum toplantıları ağırlıklı olarak Google Meet ve WhatsApp platformları üzerinden gerçekleştirilmiştir. Her hafta düzenli olarak birden fazla toplantı yapılmış ve proje süreci boyunca ekip üyeleri aktif bir şekilde iletişim halinde kalmıştır. WhatsApp grubu, proje kapsamında yapılan çalışmaların paylaşılması ve anlık bilgilendirme için etkin biçimde kullanılmıştır.
+
+İkinci sprint sürecinde ekip olarak zaman zaman iletişim kopuklukları yaşanmış olsa da, bu durum kısa sürede telafi edilmiş ve ekip yeniden birlikte hareket etmeye başlamıştır. Bu süreç, ekip olarak birlikte çalışma ve topluluk halinde üretme becerimizin gelişmesini sağlamıştır. Ayrıca, yaşanan iletişim sorunlarını tespit ederek çözüm üretme noktasında önemli deneyimler kazanılmıştır.
 
 [Daily Scrum Meets]()
 
 # Product Backlog URL
-Tüm proje planlama ve görev takibi süreçlerimizi Trello ve Google Meet üzerinde neredeyse her gün meeting gerçekleştirerek yaptık.
+Tüm proje planlama ve görev takibi süreçlerimizi Trello ve Google Meet üzerinde meeting gerçekleştirerek yaptık.
 
 [YZTA074 Trello Backlog Board - Sprint 2](https://trello.com/b/PE8u7mp7/yz74-backlog-board)
 
@@ -119,23 +121,23 @@ Projenin son durumunu gösteren fotoğraflar Google Drive üzerinde depolanmış
 ## Sprint Review 
 Sprint 2'nin sonunda ekip üyeleriyle bir araya gelinerek Sprint Review toplantısı gerçekleştirilmiştir. Bu sprintte belirlenen tüm hedeflere başarıyla ulaşılmıştır.
 
-Sprint Review Katılımcıları:
+Sprint Review Aktif Katılımcıları:
 İbrahim Kutay Şahin, Bedirhan Örseloğlu, Kerem Akkale, Hidayet Sare Budak, Damla Nur Özcan
 
 ## Sprint Retrospective 
 Toplam Puan: 120
 
-Sprint süresince ekip, hedeflenen görevleri tamamlamış ve projenin önemli bir kısmında ilerleme kaydetmiştir. Gelecek sprintler için ekip üyelerinin daha proaktif olması gerektiği vurgulanmıştır.
+* Sprint süresince ekip, hedeflenen görevleri tamamlamış ve projenin önemli bir kısmında ilerleme kaydetmiştir. Gelecek sprintler için ekip üyelerinin daha proaktif olması gerektiği vurgulanmıştır.
 
-Bu sprintte, veritabanı ve arka uç (backend) geliştirmelerinin büyük oranda tamamlanması nedeniyle, ağırlıklı olarak ön uç (frontend) geliştirmelerine odaklanılmıştır. Bu kapsamda şu çalışmalar gerçekleştirilmiştir:
+* Bu sprintte, veritabanı ve arka uç (backend) geliştirmelerinin büyük oranda tamamlanması nedeniyle, ağırlıklı olarak ön uç (frontend) geliştirmelerine odaklanılmıştır. Bu kapsamda şu çalışmalar gerçekleştirilmiştir:
 
-Ana sayfa (Homepage) tasarlanıp uygulanmıştır.
+* Ana sayfa (Homepage) tasarlanıp uygulanmıştır.
 
-Ana sayfaya, kullanıcı profilindeki sohbet botundan farklı olarak; paketler ve Marathon platformu hakkında bilgi verebilen ayrı bir sohbet botu entegre edilmiştir.
+* Ana sayfaya, kullanıcı profilindeki sohbet botundan farklı olarak; paketler ve Marathon platformu hakkında bilgi verebilen ayrı bir sohbet botu entegre edilmiştir.
 
-Backend kodlaması tamamlanmış, veritabanı bağlantıları başarıyla kurulmuştur.
+* Backend kodlaması tamamlanmış, veritabanı bağlantıları başarıyla kurulmuştur.
 
-İlk sprintte hazırlanan taslaklar gözden geçirilmiş ve iyileştirilmiştir.
+* İlk sprintte hazırlanan taslaklar gözden geçirilmiş ve iyileştirilmiştir.
 
-Kullanıcı arayüzü üzerinde çeşitli geliştirmeler yapılmıştır.
+* Kullanıcı arayüzü üzerinde çeşitli geliştirmeler yapılmıştır.
 
