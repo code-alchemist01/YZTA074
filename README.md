@@ -137,7 +137,7 @@ Toplam Puan: 120
 
 * Kullanıcı arayüzü üzerinde çeşitli geliştirmeler yapılmıştır.
 
-* Sprint Review Aktif Katılımcıları:
+Sprint Review Aktif Katılımcıları:
 İbrahim Kutay Şahin, Bedirhan Örseloğlu, Kerem Akkale, Hidayet Sare Budak, Damla Nur Özcan
 
 ## Sprint Retrospective 
