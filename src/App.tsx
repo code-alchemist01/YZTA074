@@ -3,23 +3,33 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthService } from './utils/auth';
-import { User } from './types';
+import { User, ExamResult } from './types';
 
 // Sayfa ve Bileşen Importları
 import Homepage from './components/Pages/HomePage';
 import { LoginForm } from './components/Auth/LoginForm';
 import { RegisterForm } from './components/Auth/RegisterForm';
 import { Dashboard } from './components/Dashboard/Dashboard';
-import LGSScoreCalculatorPage from './components/Pages/LGSScoreCalculatorPage'; // Yeni LGSScoreCalculatorPage'i import edin
+import LGSScoreCalculatorPage from './components/Pages/LGSScoreCalculatorPage';
+import { InitialAssessmentExam } from './components/Exam/InitialAssessmentExam';
+import { ExamResultAnalysis } from './components/Exam/ExamResultAnalysis';
+import { PreExamWelcome } from './components/Exam/PreExamWelcome';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [examResult, setExamResult] = useState<ExamResult | null>(null);
+  const [showInitialExam, setShowInitialExam] = useState(false);
+  const [showPreExamWelcome, setShowPreExamWelcome] = useState(false);
 
   useEffect(() => {
     // Uygulama yüklendiğinde mevcut kullanıcıyı kontrol et
     const currentUser = AuthService.getCurrentUser();
     setUser(currentUser);
+    
+    // Mevcut kullanıcılar için hoşgeldin ekranı AÇMAYIN
+    // Sadece yeni kayıt olanlar için açılacak
+    
     setLoading(false);
   }, []);
 
@@ -33,16 +43,42 @@ function App() {
   // Kullanıcı kayıt olduğunda çağrılacak fonksiyon
   const handleRegister = (userData: User) => {
     setUser(userData);
-    // Kayıt başarılı olduğunda dashboard'a yönlendirme yapılabilir (isteğe bağlı)
-    // navigate('/dashboard'); // Eğer useNavigate kullanırsanız
+    // İlk kayıt sonrası hoşgeldin ekranına yönlendir
+    setShowPreExamWelcome(true);
   };
 
   // Kullanıcı çıkış yaptığında çağrılacak fonksiyon
   const handleLogout = () => {
     AuthService.logout(); // AuthService'deki logout metodunu çağır
     setUser(null);
+    setShowInitialExam(false);
+    setShowPreExamWelcome(false);
+    setExamResult(null);
     // Çıkış yapıldığında ana sayfaya yönlendirme yapılabilir
     // navigate('/'); // Eğer useNavigate kullanırsanız
+  };
+
+  // Sınav başlatma
+  const handleStartExam = () => {
+    setShowPreExamWelcome(false);
+    setShowInitialExam(true);
+  };
+
+  // İlk deneme sınavı tamamlandığında
+  const handleExamComplete = (result: ExamResult) => {
+    setExamResult(result);
+    setShowInitialExam(false);
+  };
+
+  // Dashboard'a geçiş
+  const handleContinueToDashboard = () => {
+    // Kullanıcının ilk değerlendirme sınavını tamamladığını işaretle
+    if (user) {
+      const updatedUser = { ...user, hasCompletedInitialAssessment: true };
+      setUser(updatedUser);
+      localStorage.setItem('marathon_current_user', JSON.stringify(updatedUser));
+    }
+    setExamResult(null);
   };
 
   // Yükleme durumu göstergesi
@@ -54,6 +90,21 @@ function App() {
     );
   }
 
+  // Eğer kullanıcı kayıt olmuş ve hoşgeldin ekranı gösterilmesi gerekiyorsa
+  if (user && showPreExamWelcome) {
+    return <PreExamWelcome user={user} onStartExam={handleStartExam} />;
+  }
+
+  // Eğer kullanıcı kayıt olmuş ve ilk sınav gösterilmesi gerekiyorsa
+  if (user && showInitialExam) {
+    return <InitialAssessmentExam user={user} onExamComplete={handleExamComplete} />;
+  }
+
+  // Eğer sınav sonucu varsa, analiz sayfasını göster
+  if (user && examResult) {
+    return <ExamResultAnalysis result={examResult} onContinueToDashboard={handleContinueToDashboard} />;
+  }
+
   return (
     <Routes>
       {/* 1. Herkesin erişebileceği (public) rotalar */}
@@ -61,8 +112,8 @@ function App() {
       <Route path="/" element={<Homepage />} />
 
       {/* Giriş ve Kayıt sayfaları */}
-      <Route path="/login" element={<LoginForm onLogin={handleLogin} />} />
-      <Route path="/register" element={<RegisterForm onRegister={handleRegister} />} />
+      <Route path="/login" element={<LoginForm />} />
+      <Route path="/register" element={<RegisterForm onRegister={handleRegister} onSwitchToLogin={() => {}} />} />
       
       {/* LGS Puan Hesaplama sayfası */}
       <Route path="/lgs-calculator" element={<LGSScoreCalculatorPage />} />

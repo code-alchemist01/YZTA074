@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart3, TrendingUp, Clock, Target, BookOpen, FileText, Brain, Calendar } from 'lucide-react';
-import { User } from '../../types';
+import { BarChart3, TrendingUp, Clock, Target, BookOpen, FileText, Brain, Calendar, Eye, Award } from 'lucide-react';
+import { User, ExamResult } from '../../types';
 import { DataStorage } from '../../utils/dataStorage';
+import { LGSExamService } from '../../services/lgsExamService';
 
 interface AnalyticsModuleProps {
   user: User;
@@ -11,14 +12,18 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year'>('week');
   const [userActivity, setUserActivity] = useState<any>(null);
   const [timeRangeData, setTimeRangeData] = useState<any>(null);
+  const [examHistory, setExamHistory] = useState<any[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const activity = await DataStorage.getUserActivity(user.id);
         const rangeData = DataStorage.getTimeRangeData(user.id, timeRange);
+        const examHistory = LGSExamService.getUserExamHistory(user.id);
+        
         setUserActivity(activity);
         setTimeRangeData(rangeData);
+        setExamHistory(examHistory);
       } catch (error) {
         console.error('Error loading analytics data:', error);
         // Set empty data to show no data state
@@ -172,6 +177,7 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
           value={timeRange}
           onChange={(e) => setTimeRange(e.target.value as 'week' | 'month' | 'year')}
           className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          title="Zaman aralığı seç"
         >
           <option value="week">Bu Hafta</option>
           <option value="month">Bu Ay</option>
@@ -296,6 +302,90 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* LGS Sınav Sonuçları */}
+      {examHistory.length > 0 && (
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <Award className="h-5 w-5 mr-2 text-blue-600" />
+            LGS Sınav Sonuçları
+          </h3>
+          <div className="space-y-4">
+            {examHistory.slice(-3).reverse().map((session, index) => {
+              const exam = LGSExamService.getExam(session.examId);
+              if (!exam) return null;
+              
+              const academicScore = Math.round((session.score || 0 / exam.questions.length) * 100);
+              const hasEyeTracking = session.eyeTrackingData;
+              
+              return (
+                <div key={index} className="border border-gray-100 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h4 className="font-medium text-gray-900">{exam.title}</h4>
+                      <p className="text-sm text-gray-500">
+                        {new Date(session.startTime).toLocaleDateString('tr-TR')}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-blue-600">{academicScore}%</div>
+                      <div className="text-sm text-gray-500">
+                        {session.answers.filter((a: any) => a.isCorrect).length}/{exam.questions.length} doğru
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {hasEyeTracking && (
+                    <div className="bg-blue-50 rounded-lg p-3 mb-3">
+                      <div className="flex items-center mb-2">
+                        <Eye className="h-4 w-4 text-blue-600 mr-2" />
+                        <span className="text-sm font-medium text-blue-900">Dikkat Analizi</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-4 text-sm">
+                        <div>
+                          <span className="text-blue-700 font-medium">Dikkat Puanı:</span>
+                          <div className="text-blue-900 font-bold">{session.eyeTrackingData.attentionScore}/100</div>
+                        </div>
+                        <div>
+                          <span className="text-blue-700 font-medium">Odaklanma:</span>
+                          <div className="text-blue-900 font-bold">
+                            %{Math.round((session.eyeTrackingData.totalFocusTime / (session.timeSpent || 1)) * 100)}
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-blue-700 font-medium">Dikkat Dağınıklığı:</span>
+                          <div className="text-blue-900 font-bold">{session.eyeTrackingData.distractionEvents.length} kez</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-600">Süre:</span>
+                      <span className="ml-2 font-medium">
+                        {Math.round((session.timeSpent || 0) / 1000 / 60)} dakika
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Tamamlama:</span>
+                      <span className="ml-2 font-medium">{Math.round(session.completionPercentage)}%</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          
+          {examHistory.length > 3 && (
+            <div className="text-center mt-4">
+              <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                Tüm sınav sonuçlarını görüntüle ({examHistory.length} sınav)
+              </button>
+            </div>
+          )}
         </div>
       )}
 

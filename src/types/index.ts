@@ -184,6 +184,7 @@ export interface User {
   learningStyle: string[];
   joinDate: string;
   profilePicture?: string;
+  hasCompletedInitialAssessment?: boolean; // İlk değerlendirme sınavını tamamladı mı
 }
 
 export interface UserProfile {
@@ -300,4 +301,119 @@ export function userToOgrenci(user: User, hashedPassword: string): OgrenciCreate
     ogrenci_mevcutSeviye: 1,
     ogrenci_sonGuncellemeTarihi: currentDateTime, // Required field
   };
+}
+
+// LGS Deneme Sınavı İçin Yeni Tipler
+export interface LGSExam {
+  id: string;
+  title: string;
+  type: 'LGS2024' | 'LGS2025';
+  questions: LGSQuestion[];
+  timeLimit: number; // dakika
+  subjects: LGSSubject[];
+  createdAt: string;
+  isInitialAssessment?: boolean; // İlk kayıt sonrası değerlendirme sınavı mı
+}
+
+export interface LGSQuestion {
+  id: string;
+  subject: string;
+  questionText: string;
+  options: {
+    A: string;
+    B: string;
+    C: string;
+    D: string;
+  };
+  correctAnswer: 'A' | 'B' | 'C' | 'D';
+  difficulty: 'easy' | 'medium' | 'hard';
+  points: number;
+  timeToSolve?: number; // önerilen çözüm süresi (saniye)
+}
+
+export interface LGSSubject {
+  name: string;
+  questionCount: number;
+  totalPoints: number;
+}
+
+// Göz Takibi ile İlgili Tipler
+export interface EyeTrackingData {
+  sessionId: string;
+  userId: string;
+  startTime: string;
+  endTime?: string;
+  totalFocusTime: number; // milisaniye
+  totalDistractionTime: number; // milisaniye
+  distractionEvents: DistractionEvent[];
+  attentionScore: number; // 0-100 arası dikkat puanı
+  averageGazeStability: number; // göz hareketlerinin kararlılığı
+}
+
+export interface DistractionEvent {
+  timestamp: string;
+  duration: number; // milisaniye
+  type: 'gaze_away' | 'blink_excessive' | 'face_not_detected';
+  severity: 'low' | 'medium' | 'high';
+}
+
+export interface ExamSession {
+  id: string;
+  examId: string;
+  userId: string;
+  startTime: string;
+  endTime?: string;
+  answers: ExamAnswer[];
+  eyeTrackingData?: EyeTrackingData;
+  score?: number;
+  completionPercentage: number;
+  timeSpent: number; // milisaniye
+  isCompleted: boolean;
+}
+
+export interface ExamAnswer {
+  questionId: string;
+  selectedAnswer?: 'A' | 'B' | 'C' | 'D';
+  isCorrect?: boolean;
+  timeSpent: number; // bu soruya harcanan süre (milisaniye)
+  timestamp: string;
+}
+
+// Dikkat Analizi Sonuçları
+export interface AttentionAnalysis {
+  overallScore: number; // 0-100 arası genel dikkat puanı
+  focusPercentage: number; // odaklanma yüzdesi
+  distractionCount: number; // dikkat dağınıklığı sayısı
+  averageDistractionDuration: number; // ortalama dikkat dağınıklığı süresi
+  attentionPattern: 'consistent' | 'variable' | 'declining' | 'improving';
+  recommendations: string[]; // öneriler
+  comparedToAverage: 'above' | 'average' | 'below'; // yaşına göre karşılaştırma
+}
+
+// Sınav Sonuç Raporu
+export interface ExamResult {
+  examSession: ExamSession;
+  academicScore: number; // akademik başarı puanı
+  attentionAnalysis: AttentionAnalysis;
+  subjectBreakdown: SubjectResult[];
+  timeManagement: TimeManagementAnalysis;
+  overallFeedback: string;
+  nextSteps: string[];
+}
+
+export interface SubjectResult {
+  subject: string;
+  score: number;
+  correctAnswers: number;
+  totalQuestions: number;
+  averageTimePerQuestion: number;
+  attentionDuringSubject: number;
+}
+
+export interface TimeManagementAnalysis {
+  totalTimeUsed: number;
+  timeEfficiency: number; // 0-100 arası
+  quickestQuestion: number; // en hızlı çözülen soru süresi
+  slowestQuestion: number; // en yavaş çözülen soru süresi
+  timeDistribution: { [subject: string]: number }; // konulara göre zaman dağılımı
 }
