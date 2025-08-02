@@ -37,6 +37,8 @@ export const InitialAssessmentExam: React.FC<InitialAssessmentExamProps> = ({
   const [examStarted, setExamStarted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
+  const [isExamPaused, setIsExamPaused] = useState(false);
+  const [pauseReason, setPauseReason] = useState<string>('');
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -76,6 +78,16 @@ export const InitialAssessmentExam: React.FC<InitialAssessmentExamProps> = ({
     };
   }, [examStarted, timeLeft]);
 
+  // Göz takibi etkinleştirildiğinde kamera önizlemesini başlat
+  useEffect(() => {
+    if (isEyeTrackingEnabled && cameraPermission && !examStarted) {
+      startCameraPreview();
+    } else if (!isEyeTrackingEnabled) {
+      // Göz takibi kapatıldığında preview'ı kapat
+      eyeTrackingService.stopCameraPreview();
+    }
+  }, [isEyeTrackingEnabled, cameraPermission, examStarted]);
+
   const initializeExam = async () => {
     try {
       setIsLoading(true);
@@ -112,10 +124,23 @@ export const InitialAssessmentExam: React.FC<InitialAssessmentExamProps> = ({
       if (hasPermission) {
         // Eye tracking'i başlatmaya hazır
         await eyeTrackingService.initialize();
+        // Kamera izni varsa ve göz takibi etkinse hemen preview'ı başlat
+        if (isEyeTrackingEnabled) {
+          startCameraPreview();
+        }
       }
     } catch (error) {
       console.error('Camera permission check failed:', error);
       setCameraPermission(false);
+    }
+  };
+
+  // Kamera önizlemesi başlat
+  const startCameraPreview = async () => {
+    try {
+      await eyeTrackingService.startCameraPreview();
+    } catch (error) {
+      console.error('Camera preview start failed:', error);
     }
   };
 
@@ -128,7 +153,17 @@ export const InitialAssessmentExam: React.FC<InitialAssessmentExamProps> = ({
     // Eye tracking başlat (izin varsa)
     if (cameraPermission && isEyeTrackingEnabled) {
       try {
-        await eyeTrackingService.startTracking(user.id, session.id);
+        await eyeTrackingService.startTracking(user.id, session.id, (reason: string) => {
+          // Sınavı duraklat
+          setIsExamPaused(true);
+          setPauseReason(reason);
+          
+          // Timer'ı durdur
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+          }
+        });
       } catch (error) {
         console.error('Eye tracking start failed:', error);
       }
@@ -169,6 +204,24 @@ export const InitialAssessmentExam: React.FC<InitialAssessmentExamProps> = ({
       setCurrentQuestionIndex(prev => prev - 1);
       setSelectedAnswer(null);
       setQuestionStartTime(Date.now());
+    }
+  };
+
+  const resumeExam = () => {
+    setIsExamPaused(false);
+    setPauseReason('');
+    
+    // Timer'ı yeniden başlat
+    if (exam && timeLeft > 0) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            finishExam();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
     }
   };
 
@@ -252,6 +305,7 @@ export const InitialAssessmentExam: React.FC<InitialAssessmentExamProps> = ({
                 </h3>
                 <p className="text-yellow-700 mb-4">
                   Sınav sırasında dikkat seviyenizi analiz etmek için kameranızı kullanabiliriz. 
+                  Kamera açıldığında sağ üst köşede kendinizi görebileceksiniz. 
                   Bu özellik tamamen isteğe bağlıdır ve verileriniz güvenli tutulur.
                 </p>
                 
@@ -317,6 +371,39 @@ export const InitialAssessmentExam: React.FC<InitialAssessmentExamProps> = ({
 
   const currentQuestion = exam.questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / exam.questions.length) * 100;
+
+  // Sınav duraklatıldıysa özel ekran göster
+  if (isExamPaused) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-100 p-4">
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+            <div className="text-red-500 text-6xl mb-6">⚠️</div>
+            <h2 className="text-2xl font-bold text-red-700 mb-4">Sınav Duraklatıldı</h2>
+            <p className="text-red-600 mb-6 text-lg leading-relaxed">{pauseReason}</p>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <p className="text-red-700 text-sm">
+                Dikkat seviyenizi artırmak için:
+              </p>
+              <ul className="text-red-600 text-sm mt-2 space-y-1">
+                <li>• Derin nefes alın ve rahatlamaya çalışın</li>
+                <li>• Ekrana doğrudan bakın</li>
+                <li>• Çevrenizden dikkat dağıtıcı unsurları kaldırın</li>
+                <li>• Hazır olduğunuzda sınava devam edin</li>
+              </ul>
+            </div>
+            <button
+              onClick={resumeExam}
+              className="inline-flex items-center px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
+            >
+              <PlayCircle className="mr-2 h-5 w-5" />
+              Sınava Devam Et
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
@@ -429,4 +516,4 @@ export const InitialAssessmentExam: React.FC<InitialAssessmentExamProps> = ({
       </div>
     </div>
   );
-}; 
+};

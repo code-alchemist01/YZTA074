@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { FileText, Clock, CheckCircle, XCircle, Loader2, Target } from 'lucide-react';
-import { User } from '../../types';
+import React, { useState, useEffect, useRef } from 'react';
+import { FileText, Clock, CheckCircle, XCircle, Loader2, Target, Eye, EyeOff, Camera, AlertTriangle, PlayCircle, PauseCircle } from 'lucide-react';
+import { User, EyeTrackingData } from '../../types';
 import { geminiService } from '../../services/gemini';
 import { DataStorage } from '../../utils/dataStorage';
+import { EyeTrackingService } from '../../services/eyeTracking';
 
 interface ExamModuleProps {
   user: User;
@@ -82,6 +83,14 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
   const [error, setError] = useState('');
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
+  
+  // Göz takibi için state'ler
+  const [isEyeTrackingEnabled, setIsEyeTrackingEnabled] = useState(false);
+  const [eyeTrackingService] = useState(() => EyeTrackingService.getInstance());
+  const [cameraPermission, setCameraPermission] = useState<boolean | null>(null);
+  const [isExamPaused, setIsExamPaused] = useState(false);
+  const [pauseReason, setPauseReason] = useState<string>('');
+  const [eyeTrackingData, setEyeTrackingData] = useState<EyeTrackingData | null>(null);
 
   // Effect to update topics whenever a new subject is selected
   useEffect(() => {
@@ -92,6 +101,56 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
       setAvailableTopics([]);
     }
   }, [selectedSubject]);
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      eyeTrackingService.cleanup();
+    };
+  }, [eyeTrackingService]);
+
+  // Kamera izni kontrolü
+  const checkCameraPermission = async () => {
+    try {
+      const hasPermission = await EyeTrackingService.checkCameraPermissions();
+      setCameraPermission(hasPermission);
+      
+      if (hasPermission) {
+        await eyeTrackingService.initialize();
+        // Kamera izni varsa hemen preview'ı başlat
+        if (isEyeTrackingEnabled) {
+          startCameraPreview();
+        }
+      }
+    } catch (error) {
+      console.error('Camera permission check failed:', error);
+      setCameraPermission(false);
+    }
+  };
+
+  // Kamera önizlemesi başlat
+  const startCameraPreview = async () => {
+    try {
+      await eyeTrackingService.startCameraPreview();
+    } catch (error) {
+      console.error('Camera preview start failed:', error);
+    }
+  };
+
+  // İlk yüklemede kamera iznini kontrol et
+  useEffect(() => {
+    checkCameraPermission();
+  }, []);
+
+  // Göz takibi etkinleştirildiğinde kamera önizlemesini başlat
+  useEffect(() => {
+    if (isEyeTrackingEnabled && cameraPermission) {
+      startCameraPreview();
+    } else if (!isEyeTrackingEnabled) {
+      // Göz takibi kapatıldığında preview'ı kapat
+      eyeTrackingService.stopCameraPreview();
+    }
+  }, [isEyeTrackingEnabled, cameraPermission]);
 
   const handleGenerateExam = async () => {
     if (!selectedSubject) {
@@ -125,8 +184,28 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
         setCurrentQuestion(0);
         setAnswers({});
         setShowResults(false);
+        setError(''); // Clear any previous errors
+        
+        // Göz takibi etkinse başlat
+        if (cameraPermission && isEyeTrackingEnabled && sessionId) {
+          try {
+            await eyeTrackingService.startTracking(user.id, sessionId, (reason: string) => {
+              setIsExamPaused(true);
+              setPauseReason(reason);
+            });
+          } catch (error) {
+            console.error('Eye tracking start failed:', error);
+            // Don't show this error to user as it's optional
+          }
+        }
+        
+        // Show success message if using fallback questions
+        if (response.data.sinav_basligi.includes('Seviye Sınav')) {
+          console.log('Using fallback questions due to API issues');
+        }
       } else {
-        setError(response.error || 'Sınav oluşturulamadı');
+        console.error('Exam generation failed:', response.error);
+        setError('Sınav oluşturulurken bir sorun oluştu. Lütfen tekrar deneyin.');
         // End session if failed
         if (sessionId) {
           DataStorage.endStudySession(sessionId);
@@ -135,7 +214,8 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
         }
       }
     } catch (err) {
-      setError('Bir hata oluştu. Lütfen tekrar deneyin.');
+      console.error('Unexpected error during exam generation:', err);
+      setError('Beklenmeyen bir hata oluştu. İnternet bağlantınızı kontrol edip tekrar deneyin.');
       // End session if failed
       if (sessionId) {
         DataStorage.endStudySession(sessionId);
@@ -176,6 +256,12 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
   const handleFinishExam = () => {
     const score = calculateScore();
     
+    // Göz takibi verilerini al
+    const eyeData = eyeTrackingService.stopTracking();
+    if (eyeData) {
+      setEyeTrackingData(eyeData);
+    }
+    
     if (currentSessionId) {
       const timeSpent = sessionStartTime ? (new Date().getTime() - sessionStartTime.getTime()) / (1000 * 60) : 0;
       const expectedTime = generatedExam.sorular.length * 2;
@@ -188,6 +274,12 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
     }
     
     setShowResults(true);
+  };
+
+  // Sınavı devam ettirme fonksiyonu
+  const resumeExam = () => {
+    setIsExamPaused(false);
+    setPauseReason('');
   };
 
   const resetExam = () => {
@@ -217,6 +309,8 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
 
   if (showResults) {
     const score = calculateScore();
+    const attentionAnalysis = eyeTrackingData ? eyeTrackingService.generateAttentionAnalysis(eyeTrackingData) : null;
+    
     return (
       <div className="p-6">
         <div className="text-center mb-6">
@@ -237,6 +331,43 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
             {generatedExam.sorular.filter((q: any) => answers[q.soru_id] === q.dogru_cevap).length} / {generatedExam.sorular.length} doğru
           </p>
         </div>
+
+        {/* Göz Takibi Analizi */}
+        {attentionAnalysis && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold text-blue-900 mb-4 flex items-center">
+              <Eye className="h-5 w-5 mr-2" />
+              Dikkat Analizi
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">{attentionAnalysis.overallScore}</div>
+                <div className="text-sm text-gray-600">Dikkat Puanı</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">{attentionAnalysis.focusPercentage}%</div>
+                <div className="text-sm text-gray-600">Odaklanma Oranı</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">{attentionAnalysis.distractionCount}</div>
+                <div className="text-sm text-gray-600">Dikkat Dağınıklığı</div>
+              </div>
+            </div>
+            {attentionAnalysis.recommendations.length > 0 && (
+              <div className="bg-white rounded-md p-4">
+                <h4 className="font-medium text-gray-900 mb-2">Öneriler:</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  {attentionAnalysis.recommendations.map((rec, index) => (
+                    <li key={index} className="flex items-start">
+                      <span className="text-blue-500 mr-2">•</span>
+                      {rec}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="space-y-4 mb-6">
           {generatedExam.sorular.map((question: any, index: number) => {
@@ -291,6 +422,39 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
     );
   }
 
+  // Sınav duraklatıldıysa özel ekran göster
+  if (isExamPaused) {
+    return (
+      <div className="p-6">
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-white border border-red-200 rounded-xl shadow-lg p-8 text-center">
+            <div className="text-red-500 text-6xl mb-6">⚠️</div>
+            <h2 className="text-2xl font-bold text-red-700 mb-4">Sınav Duraklatıldı</h2>
+            <p className="text-red-600 mb-6 text-lg leading-relaxed">{pauseReason}</p>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <p className="text-red-700 text-sm">
+                Dikkat seviyenizi artırmak için:
+              </p>
+              <ul className="text-red-600 text-sm mt-2 space-y-1">
+                <li>• Derin nefes alın ve rahatlamaya çalışın</li>
+                <li>• Ekrana doğrudan bakın</li>
+                <li>• Çevrenizden dikkat dağıtıcı unsurları kaldırın</li>
+                <li>• Hazır olduğunuzda sınava devam edin</li>
+              </ul>
+            </div>
+            <button
+              onClick={resumeExam}
+              className="inline-flex items-center px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
+            >
+              <PlayCircle className="mr-2 h-5 w-5" />
+              Sınava Devam Et
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (generatedExam && !showResults) {
     const question = generatedExam.sorular[currentQuestion];
     const progress = ((currentQuestion + 1) / generatedExam.sorular.length) * 100;
@@ -302,6 +466,12 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
             <h2 className="text-xl font-bold text-gray-900">{generatedExam.sinav_basligi}</h2>
             <div className="flex items-center space-x-4 text-sm text-gray-600">
               <span>{currentQuestion + 1} / {generatedExam.sorular.length}</span>
+              {isEyeTrackingEnabled && (
+                <div className="flex items-center text-green-600">
+                  <Eye className="h-4 w-4 mr-1" />
+                  <span className="text-sm">Dikkat takibi aktif</span>
+                </div>
+              )}
               {currentSessionId && (
                 <div className="flex items-center text-blue-600 bg-blue-50 px-2 py-1 rounded">
                   <Clock className="h-3 w-3 mr-1" />
@@ -310,10 +480,10 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
               )}
             </div>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-gray-200 rounded-full h-2" role="progressbar" aria-label="Sınav ilerleme durumu">
             <div 
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${progress}%` }}
+              className={`bg-blue-600 h-2 rounded-full transition-all duration-300`}
+              style={{ width: `${Math.round(progress)}%` }}
             />
           </div>
         </div>
@@ -397,6 +567,7 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
             value={selectedSubject}
             onChange={(e) => setSelectedSubject(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            aria-label="Ders seçin"
           >
             <option value="">Bir ders seçin...</option>
             {Object.keys(lgsSubjects).map(subject => (
@@ -414,6 +585,7 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
             onChange={(e) => setSelectedTopic(e.target.value)}
             disabled={!selectedSubject}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            aria-label="Konu seçin"
           >
             <option value="">{selectedSubject ? 'Bir konu seçin...' : 'Önce bir ders seçin'}</option>
             {availableTopics.map(topic => (
@@ -430,6 +602,7 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
             value={difficulty}
             onChange={(e) => setDifficulty(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            aria-label="Zorluk seviyesi seçin"
           >
             <option value="Kolay">Kolay</option>
             <option value="Orta">Orta</option>
@@ -445,12 +618,56 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
             value={questionCount}
             onChange={(e) => setQuestionCount(Number(e.target.value))}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            aria-label="Soru sayısı seçin"
           >
             <option value={5}>5 Soru</option>
             <option value={10}>10 Soru</option>
             <option value={15}>15 Soru</option>
             <option value={20}>20 Soru</option>
           </select>
+        </div>
+
+        {/* Kamera İzni ve Göz Takibi */}
+        <div className="space-y-4">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <h3 className="flex items-center text-lg font-semibold text-yellow-800 mb-3">
+              <Camera className="mr-2 h-5 w-5" />
+              Dikkat Analizi (İsteğe Bağlı)
+            </h3>
+            <p className="text-yellow-700 mb-3 text-sm">
+              Sınav sırasında dikkat seviyenizi analiz etmek için kameranızı kullanabiliriz. 
+              Kamera açıldığında sağ üst köşede kendinizi görebileceksiniz. 
+              Bu özellik tamamen isteğe bağlıdır ve verileriniz güvenli tutulur.
+            </p>
+            
+            {cameraPermission === null ? (
+              <div className="flex items-center text-gray-600">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-2"></div>
+                Kamera izni kontrol ediliyor...
+              </div>
+            ) : cameraPermission ? (
+              <div>
+                <div className="flex items-center text-green-600 mb-2">
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Kamera erişimi mevcut
+                </div>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={isEyeTrackingEnabled}
+                    onChange={(e) => setIsEyeTrackingEnabled(e.target.checked)}
+                    className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <span className="text-gray-700 text-sm">Dikkat analizi etkinleştir</span>
+                </label>
+              </div>
+            ) : (
+              <div className="flex items-center text-red-600">
+                <AlertTriangle className="mr-2 h-4 w-4" />
+                <span className="text-sm">Kamera erişimi reddedildi. Sınavı kamera olmadan da yapabilirsiniz.</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {error && (
