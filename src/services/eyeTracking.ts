@@ -1382,11 +1382,13 @@ private createOverlayCanvas(): void {
     ctx.font = '12px Arial';
     ctx.fillText(`🎯 Overlay Active`, 5, 15);
     ctx.fillText(`Scale: ${scaleX.toFixed(2)}x${scaleY.toFixed(2)}`, 5, 30);
+    ctx.fillText(`Video: ${videoWidth}x${videoHeight}`, 5, 45);
+    ctx.fillText(`Overlay: ${this.overlayCanvas.width}x${this.overlayCanvas.height}`, 5, 60);
     
     // Debug: Her zaman basit bir şekil çiz
     ctx.strokeStyle = '#ff0000';
     ctx.lineWidth = 2;
-    ctx.strokeRect(10, 40, 50, 30); // Test dikdörtgeni
+    ctx.strokeRect(10, 80, 50, 30); // Test dikdörtgeni
     // Yüz dikdörtgeni (ölçeklendirilmiş)
     if (faceDetection.detected) {
       const face = faceDetection.region;
@@ -1438,21 +1440,34 @@ private createOverlayCanvas(): void {
     
     // Pupil çizimi (ölçeklendirilmiş)
     if (pupilData.pupilsDetected) {
+      console.log('🔴 Drawing pupils:', {
+        leftPupil: pupilData.leftPupil,
+        rightPupil: pupilData.rightPupil,
+        scaleX,
+        scaleY
+      });
+      
       ctx.fillStyle = '#ff0000';
-      ctx.strokeStyle = '#ff4444';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#ff0000';
+      ctx.lineWidth = 3; // Daha kalın çizgi
       
       // Sol pupil
       if (pupilData.leftPupil) {
         const lp = pupilData.leftPupil;
         const scaledX = lp.center.x * scaleX;
         const scaledY = lp.center.y * scaleY;
-        const scaledRadius = lp.radius * Math.min(scaleX, scaleY);
+        const scaledRadius = Math.max(5, lp.radius * Math.min(scaleX, scaleY)); // Minimum 5px radius
+        
+        console.log(`🔴 Left pupil: original=(${lp.center.x},${lp.center.y}) scaled=(${scaledX.toFixed(1)},${scaledY.toFixed(1)}) radius=${scaledRadius.toFixed(1)}`);
         
         ctx.beginPath();
         ctx.arc(scaledX, scaledY, scaledRadius, 0, 2 * Math.PI);
         ctx.stroke();
-        ctx.fillRect(scaledX - 2, scaledY - 2, 4, 4);
+        ctx.fill();
+        
+        // Merkez nokta (daha büyük)
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(scaledX - 3, scaledY - 3, 6, 6);
       }
       
       // Sağ pupil
@@ -1460,13 +1475,22 @@ private createOverlayCanvas(): void {
         const rp = pupilData.rightPupil;
         const scaledX = rp.center.x * scaleX;
         const scaledY = rp.center.y * scaleY;
-        const scaledRadius = rp.radius * Math.min(scaleX, scaleY);
+        const scaledRadius = Math.max(5, rp.radius * Math.min(scaleX, scaleY)); // Minimum 5px radius
         
+        console.log(`🔴 Right pupil: original=(${rp.center.x},${rp.center.y}) scaled=(${scaledX.toFixed(1)},${scaledY.toFixed(1)}) radius=${scaledRadius.toFixed(1)}`);
+        
+        ctx.fillStyle = '#ff0000';
         ctx.beginPath();
         ctx.arc(scaledX, scaledY, scaledRadius, 0, 2 * Math.PI);
         ctx.stroke();
-        ctx.fillRect(scaledX - 2, scaledY - 2, 4, 4);
+        ctx.fill();
+        
+        // Merkez nokta (daha büyük)
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(scaledX - 3, scaledY - 3, 6, 6);
       }
+    } else {
+      console.log('⚠️ No pupils detected for drawing');
     }
     
     // Odak bölgesi (ölçeklendirilmiş)
