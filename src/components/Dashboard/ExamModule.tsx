@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FileText, Clock, CheckCircle, XCircle, Loader2, Target, Eye, EyeOff, Camera, AlertTriangle, PlayCircle, PauseCircle } from 'lucide-react';
+import { FileText, Clock, CheckCircle, XCircle, Loader2, Target, Eye, EyeOff, Camera, AlertTriangle, PlayCircle, PauseCircle, Brain, Star, Award, ChevronRight, Book, Calculator, Atom, Globe, Users, Award as Trophy } from 'lucide-react';
 import { User, EyeTrackingData } from '../../types';
 import { geminiService } from '../../services/gemini';
 import { DataStorage } from '../../utils/dataStorage';
@@ -11,62 +11,98 @@ interface ExamModuleProps {
 
 // Data structure for subjects and topics, updated with more realistic LGS curriculum
 const lgsSubjects = {
-  'Türkçe': [
-    'Sözcükte Anlam ve Söz Varlığı',
-    'Cümlede Anlam',
-    'Söz Sanatları',
-    'Paragrafta Anlam ve Yapı',
-    'Metin Türleri',
-    'Cümlenin Ögeleri',
-    'Fiilde Çatı',
-    'Cümle Çeşitleri',
-    'Yazım Kuralları',
-    'Noktalama İşaretleri'
-  ],
-  'Matematik': [
-    'Çarpanlar ve Katlar',
-    'Üslü İfadeler',
-    'Kareköklü İfadeler',
-    'Veri Analizi',
-    'Olasılık',
-    'Cebirsel İfadeler ve Özdeşlikler',
-    'Doğrusal Denklemler',
-    'Eşitsizlikler',
-    'Üçgenler',
-    'Eşlik ve Benzerlik',
-    'Dönüşüm Geometrisi',
-    'Katı Cisimler'
-  ],
-  'Fen Bilimleri': [
-    'Mevsimler ve İklim',
-    'DNA ve Genetik Kod',
-    'Basınç',
-    'Madde ve Endüstri',
-    'Basit Makineler',
-    'Enerji Dönüşümleri',
-    'Elektrik Yükleri ve Elektrik Enerjisi',
-    'Canlılar ve Enerji İlişkileri'
-  ],
-  'İnkılap Tarihi ve Atatürkçülük': [
-    'Bir Kahraman Doğuyor',
-    'Millî Uyanış: Bağımsızlık Yolunda Atılan Adımlar',
-    'Millî Bir Destan: Ya İstiklal Ya Ölüm!',
-    'Atatürkçülük ve Çağdaşlaşan Türkiye'
-  ],
-  'Din Kültürü ve Ahlak Bilgisi': [
-    'Kader İnancı',
-    'Zekât, Sadaka ve Hac',
-    'Din ve Hayat',
-    'Hz. Muhammed’in Örnekliği'
-  ],
-  'İngilizce': [
-    'Friendship',
-    'Teen Life',
-    'In the Kitchen',
-    'On the Phone',
-    'The Internet',
-    'Adventures'
-  ]
+  'Türkçe': {
+    icon: Book,
+    color: 'from-rose-500 to-pink-500',
+    bgColor: 'bg-rose-50',
+    textColor: 'text-rose-700',
+    topics: [
+      'Sözcükte Anlam ve Söz Varlığı',
+      'Cümlede Anlam',
+      'Söz Sanatları',
+      'Paragrafta Anlam ve Yapı',
+      'Metin Türleri',
+      'Cümlenin Ögeleri',
+      'Fiilde Çatı',
+      'Cümle Çeşitleri',
+      'Yazım Kuralları',
+      'Noktalama İşaretleri'
+    ]
+  },
+  'Matematik': {
+    icon: Calculator,
+    color: 'from-blue-500 to-indigo-500',
+    bgColor: 'bg-blue-50',
+    textColor: 'text-blue-700',
+    topics: [
+      'Çarpanlar ve Katlar',
+      'Üslü İfadeler',
+      'Kareköklü İfadeler',
+      'Veri Analizi',
+      'Olasılık',
+      'Cebirsel İfadeler ve Özdeşlikler',
+      'Doğrusal Denklemler',
+      'Eşitsizlikler',
+      'Üçgenler',
+      'Eşlik ve Benzerlik',
+      'Dönüşüm Geometrisi',
+      'Katı Cisimler'
+    ]
+  },
+  'Fen Bilimleri': {
+    icon: Atom,
+    color: 'from-green-500 to-emerald-500',
+    bgColor: 'bg-green-50',
+    textColor: 'text-green-700',
+    topics: [
+      'Mevsimler ve İklim',
+      'DNA ve Genetik Kod',
+      'Basınç',
+      'Madde ve Endüstri',
+      'Basit Makineler',
+      'Enerji Dönüşümleri',
+      'Elektrik Yükleri ve Elektrik Enerjisi',
+      'Canlılar ve Enerji İlişkileri'
+    ]
+  },
+  'İnkılap Tarihi ve Atatürkçülük': {
+    icon: Trophy,
+    color: 'from-amber-500 to-orange-500',
+    bgColor: 'bg-amber-50',
+    textColor: 'text-amber-700',
+    topics: [
+      'Bir Kahraman Doğuyor',
+      'Millî Uyanış: Bağımsızlık Yolunda Atılan Adımlar',
+      'Millî Bir Destan: Ya İstiklal Ya Ölüm!',
+      'Atatürkçülük ve Çağdaşlaşan Türkiye'
+    ]
+  },
+  'Din Kültürü ve Ahlak Bilgisi': {
+    icon: Users,
+    color: 'from-purple-500 to-violet-500',
+    bgColor: 'bg-purple-50',
+    textColor: 'text-purple-700',
+    topics: [
+      'Kader İnancı',
+      'Zekât, Sadaka ve Hac',
+      'Din ve Hayat',
+      "Hz. Muhammed'in Örnekliği"
+    ]
+  },
+  'İngilizce': {
+    icon: Globe,
+    color: 'from-teal-500 to-cyan-500',
+    bgColor: 'bg-teal-50',
+    textColor: 'text-teal-700',
+    topics: [
+      'Friendship',
+      'Teen Life',
+      'In the Kitchen',
+      'On the Phone',
+      'The Internet',
+      'Adventures'
+    ]
+  }
 };
 
 export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
@@ -95,7 +131,7 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
   // Effect to update topics whenever a new subject is selected
   useEffect(() => {
     if (selectedSubject) {
-      setAvailableTopics(lgsSubjects[selectedSubject] || []);
+      setAvailableTopics(lgsSubjects[selectedSubject]?.topics || []);
       setSelectedTopic(''); // Reset topic when subject changes
     } else {
       setAvailableTopics([]);
@@ -550,149 +586,295 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
   }
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center">
-          <FileText className="h-6 w-6 text-blue-600 mr-3" />
-          <h2 className="text-2xl font-bold text-gray-900">Sınavlar</h2>
+    <div className="p-6 max-w-7xl mx-auto">
+      {/* Modern Header */}
+      <div className="relative bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 rounded-2xl p-8 mb-8 overflow-hidden">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative z-10 flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 mr-4">
+              <FileText className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold text-white">Sınavlar</h2>
+              <p className="text-purple-100 mt-1">Bilginizi test edin ve gelişiminizi takip edin</p>
+            </div>
+          </div>
         </div>
+        
+        {/* Decorative Elements */}
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-white/10 rounded-full"></div>
+        <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-white/10 rounded-full"></div>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
+        {/* Ders Seçim Kartları */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <Brain className="h-6 w-6 text-purple-600 mr-2" />
             Ders Seçin
-          </label>
-          <select
-            value={selectedSubject}
-            onChange={(e) => setSelectedSubject(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            aria-label="Ders seçin"
-          >
-            <option value="">Bir ders seçin...</option>
-            {Object.keys(lgsSubjects).map(subject => (
-              <option key={subject} value={subject}>{subject}</option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Konu Seçin
-          </label>
-          <select
-            value={selectedTopic}
-            onChange={(e) => setSelectedTopic(e.target.value)}
-            disabled={!selectedSubject}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-            aria-label="Konu seçin"
-          >
-            <option value="">{selectedSubject ? 'Bir konu seçin...' : 'Önce bir ders seçin'}</option>
-            {availableTopics.map(topic => (
-              <option key={topic} value={topic}>{topic}</option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Zorluk Seviyesi
-          </label>
-          <select
-            value={difficulty}
-            onChange={(e) => setDifficulty(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            aria-label="Zorluk seviyesi seçin"
-          >
-            <option value="Kolay">Kolay</option>
-            <option value="Orta">Orta</option>
-            <option value="Zor">Zor</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Soru Sayısı
-          </label>
-          <select
-            value={questionCount}
-            onChange={(e) => setQuestionCount(Number(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            aria-label="Soru sayısı seçin"
-          >
-            <option value={5}>5 Soru</option>
-            <option value={10}>10 Soru</option>
-            <option value={15}>15 Soru</option>
-            <option value={20}>20 Soru</option>
-          </select>
-        </div>
-
-        {/* Kamera İzni ve Göz Takibi */}
-        <div className="space-y-4">
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <h3 className="flex items-center text-lg font-semibold text-yellow-800 mb-3">
-              <Camera className="mr-2 h-5 w-5" />
-              Dikkat Analizi (İsteğe Bağlı)
-            </h3>
-            <p className="text-yellow-700 mb-3 text-sm">
-              Sınav sırasında dikkat seviyenizi analiz etmek için kameranızı kullanabiliriz. 
-              Kamera açıldığında sağ üst köşede kendinizi görebileceksiniz. 
-              Bu özellik tamamen isteğe bağlıdır ve verileriniz güvenli tutulur.
-            </p>
-            
-            {cameraPermission === null ? (
-              <div className="flex items-center text-gray-600">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-2"></div>
-                Kamera izni kontrol ediliyor...
-              </div>
-            ) : cameraPermission ? (
-              <div>
-                <div className="flex items-center text-green-600 mb-2">
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Kamera erişimi mevcut
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Object.entries(lgsSubjects).map(([subject, data]) => {
+              const IconComponent = data.icon;
+              const isSelected = selectedSubject === subject;
+              
+              return (
+                <div
+                  key={subject}
+                  onClick={() => setSelectedSubject(subject)}
+                  className={`relative p-6 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:scale-105 ${
+                    isSelected 
+                      ? `border-transparent bg-gradient-to-br ${data.color} text-white shadow-lg` 
+                      : `border-gray-200 ${data.bgColor} hover:border-gray-300 hover:shadow-md`
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className={`p-3 rounded-lg ${isSelected ? 'bg-white/20' : 'bg-white'} mr-3`}>
+                        <IconComponent className={`h-6 w-6 ${isSelected ? 'text-white' : data.textColor}`} />
+                      </div>
+                      <div>
+                        <h4 className={`font-semibold ${isSelected ? 'text-white' : 'text-gray-900'}`}>
+                          {subject}
+                        </h4>
+                        <p className={`text-sm ${isSelected ? 'text-white/80' : 'text-gray-600'}`}>
+                          {data.topics.length} konu
+                        </p>
+                      </div>
+                    </div>
+                    {isSelected && (
+                      <div className="bg-white/20 rounded-full p-1">
+                        <ChevronRight className="h-5 w-5 text-white" />
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={isEyeTrackingEnabled}
-                    onChange={(e) => setIsEyeTrackingEnabled(e.target.checked)}
-                    className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <span className="text-gray-700 text-sm">Dikkat analizi etkinleştir</span>
-                </label>
-              </div>
-            ) : (
-              <div className="flex items-center text-red-600">
-                <AlertTriangle className="mr-2 h-4 w-4" />
-                <span className="text-sm">Kamera erişimi reddedildi. Sınavı kamera olmadan da yapabilirsiniz.</span>
-              </div>
-            )}
+              );
+            })}
           </div>
         </div>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-3">
-            <p className="text-sm text-red-600">{error}</p>
+        {/* Konu Seçim Kartları */}
+        {selectedSubject && (
+          <div className="animate-in slide-in-from-bottom-4 duration-300">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+              <Target className="h-6 w-6 text-blue-600 mr-2" />
+              Konu Seçin
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {availableTopics.map((topic) => {
+                const isSelected = selectedTopic === topic;
+                const subjectData = lgsSubjects[selectedSubject];
+                
+                return (
+                  <div
+                    key={topic}
+                    onClick={() => setSelectedTopic(topic)}
+                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-105 ${
+                      isSelected 
+                        ? `border-transparent bg-gradient-to-br ${subjectData.color} text-white shadow-lg` 
+                        : `border-gray-200 ${subjectData.bgColor} hover:border-gray-300 hover:shadow-md`
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <h5 className={`font-medium text-sm ${isSelected ? 'text-white' : 'text-gray-900'}`}>
+                        {topic}
+                      </h5>
+                      {isSelected && (
+                        <Star className="h-4 w-4 text-white" />
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
-        <button
-          onClick={handleGenerateExam}
-          disabled={loading || !selectedSubject || !selectedTopic}
-          className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {loading ? (
-            <>
-              <Loader2 className="animate-spin h-4 w-4 mr-2" />
-              Sınav Oluşturuluyor...
-            </>
+        {/* Zorluk Seviyesi Kartları */}
+        <div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <Award className="h-6 w-6 text-amber-600 mr-2" />
+            Zorluk Seviyesi
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              { 
+                value: "Kolay", 
+                title: "Kolay", 
+                description: "Temel sorular ve kavramlar",
+                color: "from-green-500 to-emerald-500",
+                bgColor: "bg-green-50",
+                icon: "🌱"
+              },
+              { 
+                value: "Orta", 
+                title: "Orta", 
+                description: "LGS seviyesinde standart sorular",
+                color: "from-blue-500 to-indigo-500",
+                bgColor: "bg-blue-50",
+                icon: "📚"
+              },
+              { 
+                value: "Zor", 
+                title: "Zor", 
+                description: "Analitik düşünme gerektiren sorular",
+                color: "from-purple-500 to-violet-500",
+                bgColor: "bg-purple-50",
+                icon: "🚀"
+              }
+            ].map((level) => {
+              const isSelected = difficulty === level.value;
+              
+              return (
+                <div
+                  key={level.value}
+                  onClick={() => setDifficulty(level.value)}
+                  className={`p-6 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:scale-105 ${
+                    isSelected 
+                      ? `border-transparent bg-gradient-to-br ${level.color} text-white shadow-lg` 
+                      : `border-gray-200 ${level.bgColor} hover:border-gray-300 hover:shadow-md`
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="text-2xl mb-2">{level.icon}</div>
+                    <h4 className={`font-semibold mb-1 ${isSelected ? 'text-white' : 'text-gray-900'}`}>
+                      {level.title}
+                    </h4>
+                    <p className={`text-sm ${isSelected ? 'text-white/80' : 'text-gray-600'}`}>
+                      {level.description}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Soru Sayısı Kartları */}
+        <div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <FileText className="h-6 w-6 text-indigo-600 mr-2" />
+            Soru Sayısı
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { value: 5, label: "5 Soru", time: "~10 dk", icon: "⚡" },
+              { value: 10, label: "10 Soru", time: "~20 dk", icon: "🎯" },
+              { value: 15, label: "15 Soru", time: "~30 dk", icon: "📖" },
+              { value: 20, label: "20 Soru", time: "~40 dk", icon: "🏆" }
+            ].map((option) => {
+              const isSelected = questionCount === option.value;
+              
+              return (
+                <div
+                  key={option.value}
+                  onClick={() => setQuestionCount(option.value)}
+                  className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-105 ${
+                    isSelected 
+                      ? 'border-transparent bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-lg' 
+                      : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:shadow-md'
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="text-xl mb-1">{option.icon}</div>
+                    <h5 className={`font-semibold text-sm ${isSelected ? 'text-white' : 'text-gray-900'}`}>
+                      {option.label}
+                    </h5>
+                    <p className={`text-xs ${isSelected ? 'text-white/80' : 'text-gray-600'}`}>
+                      {option.time}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Kamera İzni ve Göz Takibi */}
+        <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-2xl p-6">
+          <h3 className="flex items-center text-xl font-semibold text-amber-900 mb-4">
+            <div className="bg-amber-100 rounded-lg p-2 mr-3">
+              <Camera className="h-6 w-6 text-amber-600" />
+            </div>
+            📊 Dikkat Analizi (İsteğe Bağlı)
+          </h3>
+          <p className="text-amber-800 mb-4 leading-relaxed">
+            Sınav sırasında dikkat seviyenizi analiz etmek için kameranızı kullanabiliriz. 
+            Bu özellik tamamen isteğe bağlıdır ve verileriniz güvenli tutulur.
+          </p>
+          
+          {cameraPermission === null ? (
+            <div className="flex items-center text-amber-700 bg-amber-100 rounded-lg p-3">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-amber-600 mr-3"></div>
+              <span className="font-medium">Kamera izni kontrol ediliyor...</span>
+            </div>
+          ) : cameraPermission ? (
+            <div className="space-y-3">
+              <div className="flex items-center text-green-700 bg-green-100 rounded-lg p-3">
+                <CheckCircle className="mr-3 h-5 w-5" />
+                <span className="font-medium">✅ Kamera erişimi mevcut</span>
+              </div>
+              <label className="flex items-center bg-white rounded-lg p-4 cursor-pointer hover:bg-gray-50 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={isEyeTrackingEnabled}
+                  onChange={(e) => setIsEyeTrackingEnabled(e.target.checked)}
+                  className="mr-3 h-5 w-5 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
+                />
+                <div>
+                  <span className="text-gray-900 font-medium">Dikkat analizi etkinleştir</span>
+                  <p className="text-gray-600 text-sm mt-1">Sınav sırasında dikkat dağılma uyarıları alın</p>
+                </div>
+              </label>
+            </div>
           ) : (
-            <>
-              <Target className="h-4 w-4 mr-2" />
-              Sınav Oluştur
-            </>
+            <div className="flex items-center text-red-700 bg-red-100 rounded-lg p-3">
+              <AlertTriangle className="mr-3 h-5 w-5" />
+              <span className="font-medium">⚠️ Kamera erişimi reddedildi. Sınavı kamera olmadan da yapabilirsiniz.</span>
+            </div>
           )}
-        </button>
+        </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 animate-in slide-in-from-top-2">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                  <span className="text-red-600 text-sm">⚠️</span>
+                </div>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-red-800">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="flex justify-center pt-4">
+          <button
+            onClick={handleGenerateExam}
+            disabled={loading || !selectedSubject || !selectedTopic}
+            className="relative px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 group overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="relative flex items-center">
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin h-5 w-5 mr-3" />
+                  <span>Kişiselleştirilmiş sınav oluşturuluyor...</span>
+                </>
+              ) : (
+                <>
+                  <Target className="h-5 w-5 mr-3 group-hover:animate-pulse" />
+                  <span>Sınav Oluştur</span>
+                  <ChevronRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
+            </div>
+          </button>
+        </div>
       </div>
     </div>
   );

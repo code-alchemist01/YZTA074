@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart3, Clock, Target, BookOpen, FileText, Calendar, Award, PlusCircle, Save, Loader2 } from 'lucide-react';
+import { BarChart3, Clock, Target, BookOpen, FileText, Calendar, Award, PlusCircle, Save, Loader2, Brain, Star, TrendingUp, Activity, ChevronRight, Users, Eye, Zap, Trophy } from 'lucide-react';
 import { DataStorage } from '../../utils/dataStorage';
 
 // Uygulama içinde kullanılacak veri modelleri.
@@ -325,13 +325,59 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-6 max-w-7xl mx-auto">
+      {/* Modern Header */}
+      <div className="relative bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 mb-8 overflow-hidden">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative z-10 flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 mr-4">
+              <BarChart3 className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold text-white">Performans Analizi</h2>
+              <p className="text-indigo-100 mt-1">Öğrenme performansınızı detaylı analiz edin</p>
+            </div>
+          </div>
+          
+          {/* Time Range Selector */}
+          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-1">
+            <select
+              value={timeRange}
+              onChange={(e) => setTimeRange(e.target.value as 'week' | 'month' | 'year')}
+              className="bg-transparent text-white border-none outline-none px-4 py-2 rounded-lg font-medium"
+              title="Zaman aralığı seç"
+            >
+              <option value="week" className="text-gray-900">Bu Hafta</option>
+              <option value="month" className="text-gray-900">Bu Ay</option>
+              <option value="year" className="text-gray-900">Bu Yıl</option>
+            </select>
+          </div>
+        </div>
+        
+        {/* Decorative Elements */}
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-white/10 rounded-full"></div>
+        <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-white/10 rounded-full"></div>
+      </div>
+
       {/* ADD ACTIVITY FORM */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+      <div className="bg-gradient-to-r from-white to-gray-50 rounded-2xl border border-gray-200 p-6 mb-8 shadow-sm">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">Aktivite Ekle</h3>
-          <button onClick={() => setShowAddForm(!showAddForm)} className="text-blue-600 hover:text-blue-700">
-            <PlusCircle className="h-6 w-6" />
+          <div className="flex items-center">
+            <div className="bg-blue-100 rounded-lg p-2 mr-3">
+              <PlusCircle className="h-6 w-6 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Aktivite Ekle</h3>
+              <p className="text-gray-600 text-sm">Çalışma geçmişinize yeni aktivite ekleyin</p>
+            </div>
+          </div>
+          <button 
+            onClick={() => setShowAddForm(!showAddForm)} 
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center"
+          >
+            <PlusCircle className="h-4 w-4 mr-2" />
+            {showAddForm ? 'Gizle' : 'Ekle'}
           </button>
         </div>
         {showAddForm && (
@@ -427,76 +473,96 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
         )}
       </div>
 
-      {/* Analytics Display */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center">
-          <BarChart3 className="h-6 w-6 text-blue-600 mr-3" />
-          <h2 className="text-2xl font-bold text-gray-900">Performans Analizi</h2>
-        </div>
-        <select
-          value={timeRange}
-          onChange={(e) => setTimeRange(e.target.value as 'week' | 'month' | 'year')}
-          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          title="Zaman aralığı seç"
-        >
-          <option value="week">Bu Hafta</option>
-          <option value="month">Bu Ay</option>
-          <option value="year">Bu Yıl</option>
-        </select>
-      </div>
+
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-center">
-            <Clock className="h-8 w-8 text-blue-600" />
-            <div className="ml-3">
-              <p className="text-sm text-blue-600 font-medium">Çalışma Süresi</p>
-              <p className="text-2xl font-bold text-blue-900">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Çalışma Süresi */}
+        <div className="relative bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-200 overflow-hidden group">
+          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
+                <Clock className="h-8 w-8 text-white" />
+              </div>
+              <div className="text-right">
+                <div className="text-blue-100 text-xs font-medium">{getTimeRangeLabel()}</div>
+              </div>
+            </div>
+            <div>
+              <p className="text-blue-100 text-sm font-medium mb-1">Çalışma Süresi</p>
+              <p className="text-3xl font-bold text-white">
                 {formatTime(totalStudyTime)}
               </p>
-              <p className="text-xs text-blue-500 mt-1">{getTimeRangeLabel()}</p>
             </div>
           </div>
+          <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full"></div>
         </div>
 
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <div className="flex items-center">
-            <BookOpen className="h-8 w-8 text-green-600" />
-            <div className="ml-3">
-              <p className="text-sm text-green-600 font-medium">Tamamlanan Ders</p>
-              <p className="text-2xl font-bold text-green-900">
+        {/* Tamamlanan Ders */}
+        <div className="relative bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-200 overflow-hidden group">
+          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
+                <BookOpen className="h-8 w-8 text-white" />
+              </div>
+              <div className="text-right">
+                <div className="text-green-100 text-xs font-medium">{getTimeRangeLabel()}</div>
+              </div>
+            </div>
+            <div>
+              <p className="text-green-100 text-sm font-medium mb-1">Tamamlanan Ders</p>
+              <p className="text-3xl font-bold text-white">
                 {lessonsCompleted}
               </p>
-              <p className="text-xs text-green-500 mt-1">{getTimeRangeLabel()}</p>
             </div>
           </div>
+          <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full"></div>
         </div>
 
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-          <div className="flex items-center">
-            <FileText className="h-8 w-8 text-purple-600" />
-            <div className="ml-3">
-              <p className="text-sm text-purple-600 font-medium">Tamamlanan Sınav</p>
-              <p className="text-2xl font-bold text-purple-900">
+        {/* Tamamlanan Sınav */}
+        <div className="relative bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-200 overflow-hidden group">
+          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
+                <FileText className="h-8 w-8 text-white" />
+              </div>
+              <div className="text-right">
+                <div className="text-purple-100 text-xs font-medium">{getTimeRangeLabel()}</div>
+              </div>
+            </div>
+            <div>
+              <p className="text-purple-100 text-sm font-medium mb-1">Tamamlanan Sınav</p>
+              <p className="text-3xl font-bold text-white">
                 {examsCompleted}
               </p>
-              <p className="text-xs text-purple-500 mt-1">{getTimeRangeLabel()}</p>
             </div>
           </div>
+          <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full"></div>
         </div>
 
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <div className="flex items-center">
-            <Target className="h-8 w-8 text-yellow-600" />
-            <div className="ml-3">
-              <p className="text-sm text-yellow-600 font-medium">Ortalama Puan</p>
-              <p className="text-2xl font-bold text-yellow-900">
+        {/* Ortalama Puan */}
+        <div className="relative bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-200 overflow-hidden group">
+          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
+                <Target className="h-8 w-8 text-white" />
+              </div>
+              <div className="text-right">
+                <div className="text-amber-100 text-xs font-medium">{getTimeRangeLabel()}</div>
+              </div>
+            </div>
+            <div>
+              <p className="text-amber-100 text-sm font-medium mb-1">Ortalama Puan</p>
+              <p className="text-3xl font-bold text-white">
                 {averageScore > 0 ? `${averageScore}%` : '-'}
               </p>
-              <p className="text-xs text-yellow-500 mt-1">{getTimeRangeLabel()}</p>
             </div>
           </div>
+          <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full"></div>
         </div>
       </div>
 
