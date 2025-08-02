@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GeminiRequest, GeminiResponse } from '../types';
 
-const API_KEY = 'AIzaSyC4J6VCuaGQBqswKg4HZwJdkCVNa9k3K9Q';
+const API_KEY = 'AIzaSyB3QFUEQ-hp_SgcYXMbzQ8Z-NGKtVWxQ2A';
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 export class GeminiService {

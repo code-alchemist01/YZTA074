@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, BookOpen, FileText, BarChart3, MessageCircle, Settings, LogOut } from 'lucide-react';
+import { User, BookOpen, FileText, BarChart3, MessageCircle, Settings, LogOut, Map } from 'lucide-react';
 import { AuthService } from '../../utils/auth';
 import { User as UserType } from '../../types';
 import { LessonModule } from './LessonModule';
@@ -7,6 +7,7 @@ import { ExamModule } from './ExamModule';
 import { ProfileModule } from './ProfileModule';
 import { AnalyticsModule } from './AnalyticsModule';
 import { MentorModule } from './MentorModule';
+import { LessonRoadmap } from './LessonRoadmap'; // LessonRoadmap bileşeni eklendi
 
 interface DashboardProps {
   user: UserType;
@@ -24,6 +25,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
   const tabs = [
     { id: 'lessons', label: 'Konu Anlatımı', icon: BookOpen },
     { id: 'exams', label: 'Sınavlar', icon: FileText },
+    { id: 'roadmap', label: 'Yol Haritası', icon: Map },
     { id: 'analytics', label: 'Analiz', icon: BarChart3 },
     { id: 'mentor', label: 'Sanal Rehber', icon: MessageCircle },
     { id: 'profile', label: 'Profil', icon: Settings },
@@ -41,6 +43,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
         return <MentorModule user={user} />;
       case 'profile':
         return <ProfileModule user={user} />;
+      case 'roadmap':
+        return <LessonRoadmap user={user} />;
       default:
         return <LessonModule user={user} />;
     }

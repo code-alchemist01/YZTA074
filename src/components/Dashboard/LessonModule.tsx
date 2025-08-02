@@ -8,8 +8,70 @@ interface LessonModuleProps {
   user: User;
 }
 
+// Dersleri ve konuları içeren veri yapısı, daha gerçekçi LGS müfredatına göre güncellendi
+const lgsSubjects = {
+  'Türkçe': [
+    'Sözcükte Anlam ve Söz Varlığı',
+    'Cümlede Anlam',
+    'Söz Sanatları',
+    'Paragrafta Anlam ve Yapı',
+    'Metin Türleri',
+    'Cümlenin Ögeleri',
+    'Fiilde Çatı',
+    'Cümle Çeşitleri',
+    'Yazım Kuralları',
+    'Noktalama İşaretleri'
+  ],
+  'Matematik': [
+    'Çarpanlar ve Katlar',
+    'Üslü İfadeler',
+    'Kareköklü İfadeler',
+    'Veri Analizi',
+    'Olasılık',
+    'Cebirsel İfadeler ve Özdeşlikler',
+    'Doğrusal Denklemler',
+    'Eşitsizlikler',
+    'Üçgenler',
+    'Eşlik ve Benzerlik',
+    'Dönüşüm Geometrisi',
+    'Katı Cisimler'
+  ],
+  'Fen Bilimleri': [
+    'Mevsimler ve İklim',
+    'DNA ve Genetik Kod',
+    'Basınç',
+    'Madde ve Endüstri',
+    'Basit Makineler',
+    'Enerji Dönüşümleri',
+    'Elektrik Yükleri ve Elektrik Enerjisi',
+    'Canlılar ve Enerji İlişkileri'
+  ],
+  'İnkılap Tarihi ve Atatürkçülük': [
+    'Bir Kahraman Doğuyor',
+    'Millî Uyanış: Bağımsızlık Yolunda Atılan Adımlar',
+    'Millî Bir Destan: Ya İstiklal Ya Ölüm!',
+    'Atatürkçülük ve Çağdaşlaşan Türkiye'
+  ],
+  'Din Kültürü ve Ahlak Bilgisi': [
+    'Kader İnancı',
+    'Zekât, Sadaka ve Hac',
+    'Din ve Hayat',
+    'Hz. Muhammed’in Örnekliği'
+  ],
+  'İngilizce': [
+    'Friendship',
+    'Teen Life',
+    'In the Kitchen',
+    'On the Phone',
+    'The Internet',
+    'Adventures'
+  ]
+};
+
 export const LessonModule: React.FC<LessonModuleProps> = ({ user }) => {
+  const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedTopic, setSelectedTopic] = useState('');
+  const [availableTopics, setAvailableTopics] = useState<string[]>([]);
   const [difficulty, setDifficulty] = useState('Seviye 2-Standart Pratik');
   const [generatedLesson, setGeneratedLesson] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -17,40 +79,23 @@ export const LessonModule: React.FC<LessonModuleProps> = ({ user }) => {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
 
-  const topics = [
-    'Cebirsel İfadeler',
-    'Denklemler',
-    'Eşitsizlikler',
-    'Üslü İfadeler',
-    'Köklü İfadeler',
-    'Veri Analizi',
-    'Olasılık',
-    'Üçgenler',
-    'Çember ve Daire',
-    'Prizmalar',
-    'Piramitler',
-    'Küreler',
-    'Basit Makineler',
-    'Işık',
-    'Ses',
-    'Elektrik',
-    'Maddenin Yapısı',
-    'Kimyasal Değişimler',
-    'Hücre Bölünmesi',
-    'Kalıtım',
-    "Türkiye'nin Coğrafi Bölgeleri",
-    'İklim ve Doğal Bitki Örtüsü',
-    'Nüfus ve Yerleşme',
-    'Ekonomik Faaliyetler',
-    'Osmanlı Devleti',
-    'Cumhuriyet Dönemi',
-    'Atatürk İlkeleri',
-    'Demokrasi ve İnsan Hakları',
-  ];
+  // useEffect ile seçilen ders değiştiğinde konu listesini güncelle
+  useEffect(() => {
+    if (selectedSubject) {
+      setAvailableTopics(lgsSubjects[selectedSubject] || []);
+      setSelectedTopic(''); // Ders değişince konuyu sıfırla
+    } else {
+      setAvailableTopics([]);
+    }
+  }, [selectedSubject]);
 
   const handleGenerateLesson = async () => {
+    if (!selectedSubject) {
+      setError('Lütfen bir ders seçin.');
+      return;
+    }
     if (!selectedTopic) {
-      setError('Lütfen bir konu seçin');
+      setError('Lütfen bir konu seçin.');
       return;
     }
 
@@ -58,7 +103,7 @@ export const LessonModule: React.FC<LessonModuleProps> = ({ user }) => {
     setError('');
     
     // Start tracking study session
-    const sessionId = DataStorage.startStudySession(user.id, 'lesson', selectedTopic, selectedTopic);
+    const sessionId = DataStorage.startStudySession(user.id, 'lesson', selectedSubject, selectedTopic);
     setCurrentSessionId(sessionId);
     setSessionStartTime(new Date());
     
@@ -107,6 +152,7 @@ export const LessonModule: React.FC<LessonModuleProps> = ({ user }) => {
       setSessionStartTime(null);
     }
     setGeneratedLesson(null);
+    setSelectedSubject(''); // Dersi ve konuyu bitirince sıfırla
     setSelectedTopic('');
   };
 
@@ -145,6 +191,24 @@ export const LessonModule: React.FC<LessonModuleProps> = ({ user }) => {
 
       {!generatedLesson ? (
         <div className="space-y-6">
+          {/* Ders Seçim Dropdown'ı */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Ders Seçin
+            </label>
+            <select
+              value={selectedSubject}
+              onChange={(e) => setSelectedSubject(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">Bir ders seçin...</option>
+              {Object.keys(lgsSubjects).map(subject => (
+                <option key={subject} value={subject}>{subject}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Konu Seçim Dropdown'ı (Artık dinamik) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Konu Seçin
@@ -152,10 +216,11 @@ export const LessonModule: React.FC<LessonModuleProps> = ({ user }) => {
             <select
               value={selectedTopic}
               onChange={(e) => setSelectedTopic(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              disabled={!selectedSubject} // Ders seçilmeden devre dışı kalır
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
             >
-              <option value="">Bir konu seçin...</option>
-              {topics.map(topic => (
+              <option value="">{selectedSubject ? 'Bir konu seçin...' : 'Önce bir ders seçin'}</option>
+              {availableTopics.map(topic => (
                 <option key={topic} value={topic}>{topic}</option>
               ))}
             </select>
@@ -198,7 +263,7 @@ export const LessonModule: React.FC<LessonModuleProps> = ({ user }) => {
 
           <button
             onClick={handleGenerateLesson}
-            disabled={loading}
+            disabled={loading || !selectedSubject || !selectedTopic}
             className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? (

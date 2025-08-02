@@ -8,8 +8,70 @@ interface ExamModuleProps {
   user: User;
 }
 
+// Data structure for subjects and topics, updated with more realistic LGS curriculum
+const lgsSubjects = {
+  'Türkçe': [
+    'Sözcükte Anlam ve Söz Varlığı',
+    'Cümlede Anlam',
+    'Söz Sanatları',
+    'Paragrafta Anlam ve Yapı',
+    'Metin Türleri',
+    'Cümlenin Ögeleri',
+    'Fiilde Çatı',
+    'Cümle Çeşitleri',
+    'Yazım Kuralları',
+    'Noktalama İşaretleri'
+  ],
+  'Matematik': [
+    'Çarpanlar ve Katlar',
+    'Üslü İfadeler',
+    'Kareköklü İfadeler',
+    'Veri Analizi',
+    'Olasılık',
+    'Cebirsel İfadeler ve Özdeşlikler',
+    'Doğrusal Denklemler',
+    'Eşitsizlikler',
+    'Üçgenler',
+    'Eşlik ve Benzerlik',
+    'Dönüşüm Geometrisi',
+    'Katı Cisimler'
+  ],
+  'Fen Bilimleri': [
+    'Mevsimler ve İklim',
+    'DNA ve Genetik Kod',
+    'Basınç',
+    'Madde ve Endüstri',
+    'Basit Makineler',
+    'Enerji Dönüşümleri',
+    'Elektrik Yükleri ve Elektrik Enerjisi',
+    'Canlılar ve Enerji İlişkileri'
+  ],
+  'İnkılap Tarihi ve Atatürkçülük': [
+    'Bir Kahraman Doğuyor',
+    'Millî Uyanış: Bağımsızlık Yolunda Atılan Adımlar',
+    'Millî Bir Destan: Ya İstiklal Ya Ölüm!',
+    'Atatürkçülük ve Çağdaşlaşan Türkiye'
+  ],
+  'Din Kültürü ve Ahlak Bilgisi': [
+    'Kader İnancı',
+    'Zekât, Sadaka ve Hac',
+    'Din ve Hayat',
+    'Hz. Muhammed’in Örnekliği'
+  ],
+  'İngilizce': [
+    'Friendship',
+    'Teen Life',
+    'In the Kitchen',
+    'On the Phone',
+    'The Internet',
+    'Adventures'
+  ]
+};
+
 export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
+  const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedTopic, setSelectedTopic] = useState('');
+  const [availableTopics, setAvailableTopics] = useState<string[]>([]);
   const [difficulty, setDifficulty] = useState('Orta');
   const [questionCount, setQuestionCount] = useState(5);
   const [generatedExam, setGeneratedExam] = useState<any>(null);
@@ -21,38 +83,21 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
 
-  const topics = [
-    'Cebirsel İfadeler',
-    'Denklemler',
-    'Eşitsizlikler',
-    'Üslü İfadeler',
-    'Köklü İfadeler',
-    'Veri Analizi',
-    'Olasılık',
-    'Üçgenler',
-    'Çember ve Daire',
-    'Prizmalar',
-    'Piramitler',
-    'Küreler',
-    'Basit Makineler',
-    'Işık',
-    'Ses',
-    'Elektrik',
-    'Maddenin Yapısı',
-    'Kimyasal Değişimler',
-    'Hücre Bölünmesi',
-    'Kalıtım',
-    "Türkiye'nin Coğrafi Bölgeleri",
-    'İklim ve Doğal Bitki Örtüsü',
-    'Nüfus ve Yerleşme',
-    'Ekonomik Faaliyetler',
-    'Osmanlı Devleti',
-    'Cumhuriyet Dönemi',
-    'Atatürk İlkeleri',
-    'Demokrasi ve İnsan Hakları',
-  ];
+  // Effect to update topics whenever a new subject is selected
+  useEffect(() => {
+    if (selectedSubject) {
+      setAvailableTopics(lgsSubjects[selectedSubject] || []);
+      setSelectedTopic(''); // Reset topic when subject changes
+    } else {
+      setAvailableTopics([]);
+    }
+  }, [selectedSubject]);
 
   const handleGenerateExam = async () => {
+    if (!selectedSubject) {
+      setError('Lütfen bir ders seçin.');
+      return;
+    }
     if (!selectedTopic) {
       setError('Lütfen bir konu seçin');
       return;
@@ -62,7 +107,7 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
     setError('');
     
     // Start tracking study session
-    const sessionId = DataStorage.startStudySession(user.id, 'exam', selectedTopic, selectedTopic);
+    const sessionId = DataStorage.startStudySession(user.id, 'exam', selectedSubject, selectedTopic);
     setCurrentSessionId(sessionId);
     setSessionStartTime(new Date());
     
@@ -132,11 +177,10 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
     const score = calculateScore();
     
     if (currentSessionId) {
-      // Calculate focus score based on time spent and performance
       const timeSpent = sessionStartTime ? (new Date().getTime() - sessionStartTime.getTime()) / (1000 * 60) : 0;
-      const expectedTime = generatedExam.sorular.length * 2; // 2 minutes per question
+      const expectedTime = generatedExam.sorular.length * 2;
       const timeRatio = Math.min(1, expectedTime / timeSpent);
-      const focusScore = Math.round((score * 0.7) + (timeRatio * 30)); // 70% score, 30% time efficiency
+      const focusScore = Math.round((score * 0.7) + (timeRatio * 30));
       
       DataStorage.endStudySession(currentSessionId, score, focusScore);
       setCurrentSessionId(null);
@@ -151,6 +195,7 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
     setCurrentQuestion(0);
     setAnswers({});
     setShowResults(false);
+    setSelectedSubject('');
     setSelectedTopic('');
   };
 
@@ -160,11 +205,9 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
     return `${minutes}dk`;
   };
 
-  // Update session time every minute
   useEffect(() => {
     if (currentSessionId && sessionStartTime) {
       const interval = setInterval(() => {
-        // Force re-render to update time display
         setSessionStartTime(new Date(sessionStartTime));
       }, 60000);
       
@@ -346,37 +389,52 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
       </div>
 
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Konu Seçin
-            </label>
-            <select
-              value={selectedTopic}
-              onChange={(e) => setSelectedTopic(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Bir konu seçin...</option>
-              {topics.map(topic => (
-                <option key={topic} value={topic}>{topic}</option>
-              ))}
-            </select>
-          </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Ders Seçin
+          </label>
+          <select
+            value={selectedSubject}
+            onChange={(e) => setSelectedSubject(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Bir ders seçin...</option>
+            {Object.keys(lgsSubjects).map(subject => (
+              <option key={subject} value={subject}>{subject}</option>
+            ))}
+          </select>
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Zorluk Seviyesi
-            </label>
-            <select
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="Kolay">Kolay</option>
-              <option value="Orta">Orta</option>
-              <option value="Zor">Zor</option>
-            </select>
-          </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Konu Seçin
+          </label>
+          <select
+            value={selectedTopic}
+            onChange={(e) => setSelectedTopic(e.target.value)}
+            disabled={!selectedSubject}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+          >
+            <option value="">{selectedSubject ? 'Bir konu seçin...' : 'Önce bir ders seçin'}</option>
+            {availableTopics.map(topic => (
+              <option key={topic} value={topic}>{topic}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Zorluk Seviyesi
+          </label>
+          <select
+            value={difficulty}
+            onChange={(e) => setDifficulty(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="Kolay">Kolay</option>
+            <option value="Orta">Orta</option>
+            <option value="Zor">Zor</option>
+          </select>
         </div>
 
         <div>
@@ -403,7 +461,7 @@ export const ExamModule: React.FC<ExamModuleProps> = ({ user }) => {
 
         <button
           onClick={handleGenerateExam}
-          disabled={loading}
+          disabled={loading || !selectedSubject || !selectedTopic}
           className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? (

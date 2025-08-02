@@ -1,57 +1,304 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart3, TrendingUp, Clock, Target, BookOpen, FileText, Brain, Calendar, Eye, Award } from 'lucide-react';
-import { User, ExamResult } from '../../types';
+import { BarChart3, Clock, Target, BookOpen, FileText, Calendar, Award, PlusCircle, Save, Loader2 } from 'lucide-react';
 import { DataStorage } from '../../utils/dataStorage';
-import { LGSExamService } from '../../services/lgsExamService';
+
+// Uygulama içinde kullanılacak veri modelleri.
+// Firebase'e gerek kalmadığı için types.ts gibi harici bir dosyaya ihtiyaç duyulmuyor.
+interface User {
+  id: string;
+  name: string;
+  learningStyle: string[];
+}
+
+interface ExamQuestion {
+  id: string;
+  text: string;
+}
+
+interface Exam {
+  id: string;
+  title: string;
+  questions: ExamQuestion[];
+}
+
+interface EyeTrackingData {
+  attentionScore: number;
+  totalFocusTime: number;
+  distractionEvents: string[];
+}
+
+interface Activity {
+  id: string;
+  type: 'lesson' | 'exam';
+  subject: string;
+  topic: string;
+  duration: number;
+  questionsSolved?: number;
+  score?: number;
+  examId?: string;
+  timestamp: Date;
+  completionPercentage: number;
+  eyeTrackingData?: EyeTrackingData;
+  userId: string;
+}
 
 interface AnalyticsModuleProps {
   user: User;
 }
 
+// LGS konuları için daha kapsamlı ve tutarlı bir veri yapısı
+const lgsContent: { [key: string]: string[] } = {
+  'Türkçe': [
+    'Sözcükte Anlam ve Söz Varlığı',
+    'Cümlede Anlam',
+    'Söz Sanatları',
+    'Paragrafta Anlam ve Yapı',
+    'Yazım Kuralları ve Noktalama İşaretleri',
+    'Metin Türleri ve Dil Bilgisi'
+  ],
+  'Matematik': [
+    'Çarpanlar ve Katlar',
+    'Üslü İfadeler',
+    'Kareköklü İfadeler',
+    'Veri Analizi',
+    'Olasılık',
+    'Cebirsel İfadeler ve Özdeşlikler',
+    'Doğrusal Denklemler',
+    'Eşitsizlikler',
+    'Üçgenler',
+    'Dönüşüm Geometrisi',
+    'Katı Cisimler'
+  ],
+  'Fen Bilimleri': [
+    'Mevsimler ve İklim',
+    'DNA ve Genetik Kod',
+    'Basınç',
+    'Madde ve Endüstri',
+    'Basit Makineler',
+    'Enerji Dönüşümleri',
+    'Elektrik Yükleri ve Elektrik Enerjisi',
+    'Genetik ve Biyoteknoloji'
+  ],
+  'T.C. İnkılap Tarihi ve Atatürkçülük': [
+    'Bir Kahraman Doğuyor',
+    'Milli Uyanış: Bağımsızlık Yolunda Atılan Adımlar',
+    'Milli Bir Destan: Ya İstiklal Ya Ölüm!',
+    'Çağdaş Türkiye Yolunda Adımlar'
+  ],
+  'Din Kültürü ve Ahlak Bilgisi': [
+    'Kader İnancı',
+    'Zekat ve Sadaka',
+    'Din ve Hayat',
+    'Hz. Muhammed\'in Hayatı'
+  ],
+  'İngilizce': [
+    'Friendship',
+    'Teen Life',
+    'In The Kitchen',
+    'On The Phone'
+  ]
+};
+
+// Sınavlar için mock veri
+const mockExams: Exam[] = [
+  { id: 'lgs-exam-1', title: 'LGS Deneme Sınavı-1', questions: [{ id: 'q1', text: 'Soru 1' }, { id: 'q2', text: 'Soru 2' }, { id: 'q3', text: 'Soru 3' }] },
+  { id: 'lgs-exam-2', title: 'LGS Deneme Sınavı-2', questions: [{ id: 'q1', text: 'Soru 1' }, { id: 'q2', text: 'Soru 2' }, { id: 'q3', text: 'Soru 3' }, { id: 'q4', text: 'Soru 4' }] },
+];
+
+// Kullanıcı verilerini DataStorage'dan yükle
+
 export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year'>('week');
-  const [userActivity, setUserActivity] = useState<any>(null);
-  const [timeRangeData, setTimeRangeData] = useState<any>(null);
-  const [examHistory, setExamHistory] = useState<any[]>([]);
+  const [userActivity, setUserActivity] = useState<Activity[]>([]);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [loading, setLoading] = useState(true);
+  
+  const initialSubject = Object.keys(lgsContent)[0];
+  const initialTopic = lgsContent[initialSubject][0];
 
+  const [newActivity, setNewActivity] = useState<Partial<Activity>>({
+    type: 'lesson',
+    subject: initialSubject,
+    topic: initialTopic,
+    duration: 30,
+    questionsSolved: 20,
+    score: 80,
+    examId: mockExams[0].id
+  });
+
+  // Kullanıcı verilerini yükle
   useEffect(() => {
-    const loadData = async () => {
+    const loadUserData = async () => {
       try {
-        const activity = await DataStorage.getUserActivity(user.id);
-        const rangeData = DataStorage.getTimeRangeData(user.id, timeRange);
-        const examHistory = LGSExamService.getUserExamHistory(user.id);
+        setLoading(true);
+        const userActivityData = await DataStorage.getUserActivity(user.id);
         
-        setUserActivity(activity);
-        setTimeRangeData(rangeData);
-        setExamHistory(examHistory);
+        // StudySession'ları Activity formatına dönüştür
+        const activities: Activity[] = userActivityData.studySessions.map(session => ({
+          id: session.id,
+          type: session.type,
+          subject: session.subject,
+          topic: session.topic,
+          duration: session.duration,
+          questionsSolved: session.type === 'exam' ? 1 : undefined,
+          score: session.score,
+          timestamp: session.startTime,
+          completionPercentage: session.completed ? 100 : 0,
+          eyeTrackingData: session.focusScore ? {
+            attentionScore: session.focusScore,
+            totalFocusTime: session.duration * 0.8,
+            distractionEvents: []
+          } : undefined,
+          userId: session.userId
+        }));
+
+        setUserActivity(activities);
       } catch (error) {
-        console.error('Error loading analytics data:', error);
-        // Set empty data to show no data state
-        setUserActivity({
-          userId: user.id,
-          studySessions: [],
-          totalStudyTime: 0,
-          completedLessons: 0,
-          completedExams: 0,
-          averageScore: 0,
-          subjectProgress: {},
-          weeklyActivity: {},
-          monthlyActivity: {}
-        });
-        setTimeRangeData({
-          studyTime: 0,
-          lessonsCompleted: 0,
-          examsCompleted: 0,
-          averageScore: 0,
-          focusScore: 0
-        });
+        console.error('Error loading user data:', error);
+        setUserActivity([]);
+      } finally {
+        setLoading(false);
       }
     };
+
+    loadUserData();
+  }, [user.id]);
+
+  // Yeni aktivite ekleme
+  const handleAddActivity = async (e: React.FormEvent) => {
+    e.preventDefault();
     
-    loadData();
-  }, [user.id, timeRange]);
+    try {
+      // DataStorage'a gerçek bir session başlat ve bitir
+      const sessionId = await DataStorage.startStudySession(
+        user.id, 
+        newActivity.type!, 
+        newActivity.subject!, 
+        newActivity.topic!
+      );
+
+      // Session'ı hemen bitir (simülasyon)
+      await DataStorage.endStudySession(
+        sessionId, 
+        newActivity.score, 
+        newActivity.type === 'exam' ? Math.floor(Math.random() * 101) : 85
+      );
+
+      // Verileri yeniden yükle
+      const userActivityData = await DataStorage.getUserActivity(user.id);
+      const activities: Activity[] = userActivityData.studySessions.map(session => ({
+        id: session.id,
+        type: session.type,
+        subject: session.subject,
+        topic: session.topic,
+        duration: session.duration,
+        questionsSolved: session.type === 'exam' ? 1 : undefined,
+        score: session.score,
+        timestamp: session.startTime,
+        completionPercentage: session.completed ? 100 : 0,
+        eyeTrackingData: session.focusScore ? {
+          attentionScore: session.focusScore,
+          totalFocusTime: session.duration * 0.8,
+          distractionEvents: []
+        } : undefined,
+        userId: session.userId
+      }));
+
+      setUserActivity(activities);
+      setShowAddForm(false);
+    } catch (error) {
+      console.error('Error adding activity:', error);
+    }
+  };
+
+  const getFilteredActivities = () => {
+    const now = new Date();
+    let startDate: Date;
+
+    switch (timeRange) {
+      case 'week':
+        startDate = new Date(now.setDate(now.getDate() - 7));
+        break;
+      case 'month':
+        startDate = new Date(now.setMonth(now.getMonth() - 1));
+        break;
+      case 'year':
+        startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+        break;
+      default:
+        startDate = new Date(now.setDate(now.getDate() - 7));
+    }
+    
+    return userActivity.filter(activity => activity.timestamp >= startDate);
+  };
+  
+  const filteredActivities = getFilteredActivities();
+
+  // Veri hesaplama
+  const totalStudyTime = filteredActivities.reduce((acc, curr) => acc + (curr.duration || 0), 0);
+  const lessonsCompleted = filteredActivities.filter(a => a.type === 'lesson').length;
+  const examsCompleted = filteredActivities.filter(a => a.type === 'exam').length;
+  const examScores = filteredActivities.filter(a => a.type === 'exam' && a.score !== undefined).map(a => a.score);
+  const averageScore = examScores.length > 0 ? Math.round(examScores.reduce((sum, score) => sum + score, 0) / examScores.length) : 0;
+  const focusScores = filteredActivities.filter(a => a.eyeTrackingData).map(a => a.eyeTrackingData!.attentionScore);
+  const focusScore = focusScores.length > 0 ? Math.round(focusScores.reduce((sum, score) => sum + score, 0) / focusScores.length) : 0;
+
+  const weeklyActivity: { [key: string]: number } = {
+    'Pazartesi': 0, 'Salı': 0, 'Çarşamba': 0, 'Perşembe': 0, 'Cuma': 0, 'Cumartesi': 0, 'Pazar': 0
+  };
+  filteredActivities.forEach(activity => {
+    const day = new Date(activity.timestamp).toLocaleDateString('tr-TR', { weekday: 'long' });
+    weeklyActivity[day] = (weeklyActivity[day] || 0) + (activity.duration || 0);
+  });
+
+  const getSubjectProgress = () => {
+    const subjectMap: Record<string, { totalTime: number; lessons: number; exams: number; scores: number[]; topics: Set<string> }> = {};
+    
+    filteredActivities.forEach(session => {
+      const subject = session.subject;
+      if (!subject) return;
+
+      if (!subjectMap[subject]) {
+        subjectMap[subject] = {
+          totalTime: 0,
+          lessons: 0,
+          exams: 0,
+          scores: [],
+          topics: new Set()
+        };
+      }
+      
+      subjectMap[subject].totalTime += session.duration || 0;
+      subjectMap[subject].topics.add(session.topic);
+      
+      if (session.type === 'lesson') {
+        subjectMap[subject].lessons++;
+      } else if (session.type === 'exam') {
+        subjectMap[subject].exams++;
+        if (session.score !== undefined) {
+          subjectMap[subject].scores.push(session.score);
+        }
+      }
+    });
+
+    return Object.entries(subjectMap).map(([subject, data]) => {
+      const averageScore = data.scores.length > 0 ? Math.round(data.scores.reduce((total, score) => total + score, 0) / data.scores.length) : 0;
+      const totalTopics = lgsContent[subject]?.length || 1;
+      return {
+        subject,
+        progress: Math.min(100, Math.round((data.topics.size / totalTopics) * 100)),
+        time: data.totalTime,
+        lessons: data.lessons,
+        exams: data.exams,
+        averageScore: averageScore
+      };
+    });
+  };
+
+  const subjectProgress = getSubjectProgress();
 
   const formatTime = (minutes: number) => {
+    if (isNaN(minutes)) return '0dk';
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return hours > 0 ? `${hours}s ${mins}dk` : `${mins}dk`;
@@ -66,108 +313,121 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
     }
   };
 
-  const getSubjectName = (subject: string) => {
-    const subjectMap: Record<string, string> = {
-      'Cebirsel İfadeler': 'Matematik',
-      'Denklemler': 'Matematik',
-      'Eşitsizlikler': 'Matematik',
-      'Üslü İfadeler': 'Matematik',
-      'Köklü İfadeler': 'Matematik',
-      'Veri Analizi': 'Matematik',
-      'Olasılık': 'Matematik',
-      'Üçgenler': 'Matematik',
-      'Çember ve Daire': 'Matematik',
-      'Prizmalar': 'Matematik',
-      'Piramitler': 'Matematik',
-      'Küreler': 'Matematik',
-      'Basit Makineler': 'Fen Bilimleri',
-      'Işık': 'Fen Bilimleri',
-      'Ses': 'Fen Bilimleri',
-      'Elektrik': 'Fen Bilimleri',
-      'Maddenin Yapısı': 'Fen Bilimleri',
-      'Kimyasal Değişimler': 'Fen Bilimleri',
-      'Hücre Bölünmesi': 'Fen Bilimleri',
-      'Kalıtım': 'Fen Bilimleri',
-      "Türkiye'nin Coğrafi Bölgeleri": 'Sosyal Bilgiler',
-      'İklim ve Doğal Bitki Örtüsü': 'Sosyal Bilgiler',
-      'Nüfus ve Yerleşme': 'Sosyal Bilgiler',
-      'Ekonomik Faaliyetler': 'Sosyal Bilgiler',
-      'Osmanlı Devleti': 'Sosyal Bilgiler',
-      'Cumhuriyet Dönemi': 'Sosyal Bilgiler',
-      'Atatürk İlkeleri': 'Sosyal Bilgiler',
-      'Demokrasi ve İnsan Hakları': 'Sosyal Bilgiler',
-    };
-    return subjectMap[subject] || subject;
-  };
-
-  const getSubjectProgress = () => {
-    if (!userActivity) return [];
-    
-    const subjectMap: Record<string, { totalTime: number; completedLessons: number; completedExams: number; averageScore: number; topics: Set<string> }> = {};
-    
-    userActivity.studySessions.forEach((session: any) => {
-      const subject = getSubjectName(session.topic);
-      if (!subjectMap[subject]) {
-        subjectMap[subject] = {
-          totalTime: 0,
-          completedLessons: 0,
-          completedExams: 0,
-          averageScore: 0,
-          topics: new Set()
-        };
-      }
-      
-      subjectMap[subject].totalTime += session.duration;
-      subjectMap[subject].topics.add(session.topic);
-      
-      if (session.type === 'lesson') {
-        subjectMap[subject].completedLessons++;
-      } else if (session.type === 'exam') {
-        subjectMap[subject].completedExams++;
-      }
-    });
-    
-    // Calculate average scores for each subject
-    Object.keys(subjectMap).forEach(subject => {
-      const examSessions = userActivity.studySessions.filter((s: any) => 
-        getSubjectName(s.topic) === subject && s.type === 'exam' && s.score !== undefined
-      );
-      
-      if (examSessions.length > 0) {
-        subjectMap[subject].averageScore = Math.round(
-          examSessions.reduce((total: number, session: any) => total + session.score, 0) / examSessions.length
-        );
-      }
-    });
-    
-    return Object.entries(subjectMap).map(([subject, data]) => ({
-      subject,
-      progress: Math.min(100, Math.round((data.topics.size / 7) * 100)), // Assuming 7 topics per subject
-      time: data.totalTime,
-      lessons: data.completedLessons,
-      exams: data.completedExams,
-      averageScore: data.averageScore
-    }));
-  };
-
-  if (!userActivity || !timeRangeData) {
+  if (loading) {
     return (
-      <div className="p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <Brain className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">Henüz analiz edilecek veri yok.</p>
-            <p className="text-sm text-gray-400 mt-2">Ders çalışmaya başladığınızda verileriniz burada görünecek.</p>
-          </div>
+      <div className="p-6 flex items-center justify-center min-h-64">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600">Analiz verileri yükleniyor...</p>
         </div>
       </div>
     );
   }
 
-  const subjectProgress = getSubjectProgress();
-
   return (
     <div className="p-6">
+      {/* ADD ACTIVITY FORM */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-900">Aktivite Ekle</h3>
+          <button onClick={() => setShowAddForm(!showAddForm)} className="text-blue-600 hover:text-blue-700">
+            <PlusCircle className="h-6 w-6" />
+          </button>
+        </div>
+        {showAddForm && (
+          <form onSubmit={handleAddActivity} className="mt-4 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Türü</label>
+                <select
+                  value={newActivity.type}
+                  onChange={(e) => {
+                    setNewActivity(prev => ({
+                      ...prev,
+                      type: e.target.value as 'lesson' | 'exam',
+                      examId: e.target.value === 'exam' ? mockExams[0].id : undefined
+                    }));
+                  }}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option value="lesson">Ders Çalışma</option>
+                  <option value="exam">Sınav</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Ders</label>
+                <select
+                  value={newActivity.subject}
+                  onChange={(e) => setNewActivity({ ...newActivity, subject: e.target.value, topic: lgsContent[e.target.value][0] })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  {Object.keys(lgsContent).map(subject => (
+                    <option key={subject} value={subject}>{subject}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Konu</label>
+              <select
+                value={newActivity.topic}
+                onChange={(e) => setNewActivity({ ...newActivity, topic: e.target.value })}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                {lgsContent[newActivity.subject || initialSubject]?.map(topic => (
+                  <option key={topic} value={topic}>{topic}</option>
+                ))}
+              </select>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Süre (dk)</label>
+                <input
+                  type="number"
+                  value={newActivity.duration}
+                  onChange={(e) => setNewActivity({ ...newActivity, duration: parseInt(e.target.value, 10) })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              {newActivity.type === 'exam' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Puan (%)</label>
+                    <input
+                      type="number"
+                      value={newActivity.score}
+                      onChange={(e) => setNewActivity({ ...newActivity, score: parseInt(e.target.value, 10) })}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Sınav Adı</label>
+                    <select
+                      value={newActivity.examId}
+                      onChange={(e) => setNewActivity({ ...newActivity, examId: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    >
+                      {mockExams.map(exam => (
+                        <option key={exam.id} value={exam.id}>{exam.title}</option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              )}
+            </div>
+            <button
+              type="submit"
+              className="w-full flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Kaydet
+            </button>
+          </form>
+        )}
+      </div>
+
+      {/* Analytics Display */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
           <BarChart3 className="h-6 w-6 text-blue-600 mr-3" />
@@ -193,7 +453,7 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
             <div className="ml-3">
               <p className="text-sm text-blue-600 font-medium">Çalışma Süresi</p>
               <p className="text-2xl font-bold text-blue-900">
-                {formatTime(timeRangeData.studyTime)}
+                {formatTime(totalStudyTime)}
               </p>
               <p className="text-xs text-blue-500 mt-1">{getTimeRangeLabel()}</p>
             </div>
@@ -206,7 +466,7 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
             <div className="ml-3">
               <p className="text-sm text-green-600 font-medium">Tamamlanan Ders</p>
               <p className="text-2xl font-bold text-green-900">
-                {timeRangeData.lessonsCompleted}
+                {lessonsCompleted}
               </p>
               <p className="text-xs text-green-500 mt-1">{getTimeRangeLabel()}</p>
             </div>
@@ -219,7 +479,7 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
             <div className="ml-3">
               <p className="text-sm text-purple-600 font-medium">Tamamlanan Sınav</p>
               <p className="text-2xl font-bold text-purple-900">
-                {timeRangeData.examsCompleted}
+                {examsCompleted}
               </p>
               <p className="text-xs text-purple-500 mt-1">{getTimeRangeLabel()}</p>
             </div>
@@ -232,7 +492,7 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
             <div className="ml-3">
               <p className="text-sm text-yellow-600 font-medium">Ortalama Puan</p>
               <p className="text-2xl font-bold text-yellow-900">
-                {timeRangeData.averageScore > 0 ? `${timeRangeData.averageScore}%` : '-'}
+                {averageScore > 0 ? `${averageScore}%` : '-'}
               </p>
               <p className="text-xs text-yellow-500 mt-1">{getTimeRangeLabel()}</p>
             </div>
@@ -278,46 +538,47 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
       )}
 
       {/* Weekly Activity */}
-      {userActivity.weeklyActivity && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
             <Calendar className="h-5 w-5 mr-2 text-blue-600" />
             Haftalık Aktivite
-          </h3>
-          <div className="space-y-2">
-            {Object.entries(userActivity.weeklyActivity).map(([day, minutes]) => (
-              <div key={day} className="flex items-center">
-                <div className="w-20 text-sm text-gray-600">{day}</div>
-                <div className="flex-1 mx-4">
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-green-600 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${Math.min(100, (minutes as number / 120) * 100)}%` }}
-                    />
-                  </div>
-                </div>
-                <div className="text-sm text-gray-500 w-12 text-right">
-                  {formatTime(minutes as number)}
+        </h3>
+        <div className="space-y-2">
+          {Object.entries(weeklyActivity).map(([day, minutes]) => (
+            <div key={day} className="flex items-center">
+              <div className="w-20 text-sm text-gray-600">{day}</div>
+              <div className="flex-1 mx-4">
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${Math.min(100, (minutes as number / 120) * 100)}%` }}
+                  />
                 </div>
               </div>
-            ))}
-          </div>
+              <div className="text-sm text-gray-500 w-12 text-right">
+                {formatTime(minutes as number)}
+              </div>
+            </div>
+          ))}
         </div>
-      )}
+      </div>
 
       {/* LGS Sınav Sonuçları */}
-      {examHistory.length > 0 && (
+      {filteredActivities.filter(a => a.type === 'exam' && a.examId).length > 0 && (
         <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
             <Award className="h-5 w-5 mr-2 text-blue-600" />
             LGS Sınav Sonuçları
           </h3>
           <div className="space-y-4">
-            {examHistory.slice(-3).reverse().map((session, index) => {
-              const exam = LGSExamService.getExam(session.examId);
+            {filteredActivities
+              .filter(a => a.type === 'exam' && a.examId)
+              .slice(-3).reverse()
+              .map((session, index) => {
+              const exam = mockExams.find(e => e.id === session.examId);
               if (!exam) return null;
               
-              const academicScore = Math.round((session.score || 0 / exam.questions.length) * 100);
+              const academicScore = session.score || 0;
               const hasEyeTracking = session.eyeTrackingData;
               
               return (
@@ -326,13 +587,13 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
                     <div>
                       <h4 className="font-medium text-gray-900">{exam.title}</h4>
                       <p className="text-sm text-gray-500">
-                        {new Date(session.startTime).toLocaleDateString('tr-TR')}
+                        {session.timestamp.toLocaleDateString('tr-TR')}
                       </p>
                     </div>
                     <div className="text-right">
                       <div className="text-2xl font-bold text-blue-600">{academicScore}%</div>
                       <div className="text-sm text-gray-500">
-                        {session.answers.filter((a: any) => a.isCorrect).length}/{exam.questions.length} doğru
+                        {Math.round((academicScore / 100) * exam.questions.length)}/{exam.questions.length} doğru
                       </div>
                     </div>
                   </div>
@@ -340,7 +601,7 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
                   {hasEyeTracking && (
                     <div className="bg-blue-50 rounded-lg p-3 mb-3">
                       <div className="flex items-center mb-2">
-                        <Eye className="h-4 w-4 text-blue-600 mr-2" />
+                        <BarChart3 className="h-4 w-4 text-blue-600 mr-2" />
                         <span className="text-sm font-medium text-blue-900">Dikkat Analizi</span>
                       </div>
                       <div className="grid grid-cols-3 gap-4 text-sm">
@@ -351,7 +612,7 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
                         <div>
                           <span className="text-blue-700 font-medium">Odaklanma:</span>
                           <div className="text-blue-900 font-bold">
-                            %{Math.round((session.eyeTrackingData.totalFocusTime / (session.timeSpent || 1)) * 100)}
+                            %{Math.round((session.eyeTrackingData.totalFocusTime / (session.duration || 1)) * 100)}
                           </div>
                         </div>
                         <div>
@@ -366,12 +627,12 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
                     <div>
                       <span className="text-gray-600">Süre:</span>
                       <span className="ml-2 font-medium">
-                        {Math.round((session.timeSpent || 0) / 1000 / 60)} dakika
+                        {formatTime(session.duration || 0)}
                       </span>
                     </div>
                     <div>
                       <span className="text-gray-600">Tamamlama:</span>
-                      <span className="ml-2 font-medium">{Math.round(session.completionPercentage)}%</span>
+                      <span className="ml-2 font-medium">{session.completionPercentage || 100}%</span>
                     </div>
                   </div>
                 </div>
@@ -379,10 +640,10 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
             })}
           </div>
           
-          {examHistory.length > 3 && (
+          {filteredActivities.filter(a => a.type === 'exam' && a.examId).length > 3 && (
             <div className="text-center mt-4">
               <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                Tüm sınav sonuçlarını görüntüle ({examHistory.length} sınav)
+                Tüm sınav sonuçlarını görüntüle ({filteredActivities.filter(a => a.type === 'exam').length} sınav)
               </button>
             </div>
           )}
@@ -399,11 +660,11 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
               <div className="flex-1 bg-gray-200 rounded-full h-3 mr-3">
                 <div 
                   className="bg-blue-600 h-3 rounded-full transition-all duration-300"
-                  style={{ width: `${timeRangeData.focusScore}%` }}
+                  style={{ width: `${focusScore}%` }}
                 />
               </div>
               <span className="text-sm font-medium text-gray-900">
-                {timeRangeData.focusScore > 0 ? `${timeRangeData.focusScore}%` : 'Veri yok'}
+                {focusScore > 0 ? `${focusScore}%` : 'Veri yok'}
               </span>
             </div>
             <p className="text-xs text-gray-500 mt-1">
@@ -424,19 +685,18 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
               ))}
             </div>
             <p className="text-xs text-gray-500 mt-2">
-              Toplam {userActivity.totalStudyTime > 0 ? formatTime(userActivity.totalStudyTime) : '0dk'} çalışma
+              Toplam {userActivity.length > 0 ? formatTime(totalStudyTime) : '0dk'} çalışma
             </p>
           </div>
         </div>
 
-        {userActivity.studySessions.length > 0 && (
+        {userActivity.length > 0 && (
           <div className="mt-6 pt-6 border-t border-gray-200">
             <h4 className="font-medium text-gray-700 mb-3">Son Aktiviteler</h4>
             <div className="space-y-2 max-h-40 overflow-y-auto">
-              {userActivity.studySessions
-                .slice(-5)
-                .reverse()
-                .map((session: any, index: number) => (
+              {userActivity
+                .slice(0, 5)
+                .map((session, index) => (
                 <div key={index} className="flex items-center justify-between text-sm">
                   <div className="flex items-center">
                     {session.type === 'lesson' ? (
@@ -447,7 +707,7 @@ export const AnalyticsModule: React.FC<AnalyticsModuleProps> = ({ user }) => {
                     <span className="text-gray-700">{session.topic}</span>
                   </div>
                   <div className="flex items-center space-x-2 text-gray-500">
-                    <span>{formatTime(session.duration)}</span>
+                    <span>{formatTime(session.duration || 0)}</span>
                     {session.score && (
                       <span className="text-green-600 font-medium">{session.score}%</span>
                     )}

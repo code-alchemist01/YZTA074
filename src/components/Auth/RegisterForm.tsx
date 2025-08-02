@@ -17,7 +17,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onRegister, onSwitch
     confirmPassword: '',
     birthDate: '',
     grade: '8',
-    adhdType: 'none' as 'none' | 'inattentive' | 'hyperactive' | 'combined',
+    adhdType: 'none' as 'none' | 'dikkat eksikliği' | 'hiperaktivite' | 'ikisi de',
     learningStyle: [] as string[],
   });
   const [error, setError] = useState('');

@@ -40,7 +40,7 @@ export class DataStorage {
   private static readonly STUDY_SESSIONS_KEY = 'marathon_study_sessions';
   private static readonly USER_ACTIVITY_KEY = 'marathon_user_activity';
 
-  static async startStudySession(userId: string, type: 'lesson' | 'exam', subject: string, topic: string): Promise<string> {
+  static startStudySession(userId: string, type: 'lesson' | 'exam', subject: string, topic: string): string {
     try {
       const sessionId = this.generateId();
       const session: StudySession = {
@@ -60,7 +60,7 @@ export class DataStorage {
       sessions.push(session);
       localStorage.setItem(this.STUDY_SESSIONS_KEY, JSON.stringify(sessions));
       
-      // Create corresponding backend entry based on type
+      // Try to create backend entry asynchronously (non-blocking)
       if (type === 'lesson') {
         const dersData: DerslerCreate = {
           ders_adi: `${subject} - ${topic}`,
@@ -69,11 +69,16 @@ export class DataStorage {
           ders_tarihi: session.startTime.toISOString().split('T')[0],
         };
         
-        try {
-          await ApiService.createDers(dersData);
-        } catch (error) {
+        // Non-blocking backend call
+        ApiService.createDers(dersData).catch(error => {
           console.warn('Failed to create lesson in backend:', error);
-        }
+          console.warn('Ders data that failed:', dersData);
+          if (error.response) {
+            console.warn('Backend error response:', error.response.data);
+            console.warn('Backend error status:', error.response.status);
+          }
+          // Continue working with local data only
+        });
       }
       
       return sessionId;
@@ -84,7 +89,7 @@ export class DataStorage {
     }
   }
 
-  static async endStudySession(sessionId: string, score?: number, focusScore?: number): Promise<void> {
+  static endStudySession(sessionId: string, score?: number, focusScore?: number): void {
     try {
       const sessions = this.getStudySessions();
       const sessionIndex = sessions.findIndex(s => s.id === sessionId);
@@ -100,11 +105,15 @@ export class DataStorage {
         sessions[sessionIndex] = session;
         localStorage.setItem(this.STUDY_SESSIONS_KEY, JSON.stringify(sessions));
         
-        // Update backend
-        await this.syncSessionToBackend(session);
+        // Update backend (non-blocking)
+        this.syncSessionToBackend(session).catch(error => {
+          console.warn('Failed to sync session to backend:', error);
+        });
         
-        // Update user activity
-        await this.updateUserActivity(session.userId);
+        // Update user activity (non-blocking)
+        this.updateUserActivity(session.userId).catch(error => {
+          console.warn('Failed to update user activity:', error);
+        });
       }
     } catch (error) {
       console.error('Error ending study session:', error);
