@@ -16,10 +16,8 @@ const Navbar: React.FC = () => {
           />
         </Link>
         <nav className="flex flex-wrap justify-center md:justify-end gap-x-6 gap-y-2 text-base text-gray-700 font-semibold items-center">
-          <a href="#packages" className="hover:text-marathon-primary-blue transition-colors">Paketlerimiz</a>
-          <a href="#sample-videos" className="hover:text-marathon-primary-blue transition-colors">Örnek Videolar</a>
+          <a href="#packages" className="hover:text-marathon-primary-blue transition-colors">Paketlerimiz</a>         
           <a href="#comments" className="hover:text-marathon-primary-blue transition-colors">Yorumlar ve Başarılarımız</a>
-          <a href="#help" className="hover:text-marathon-primary-blue transition-colors">Yardım</a>
           <a href="#about" className="hover:text-marathon-primary-blue transition-colors">Biz Kimiz</a>
           <a href="#contact-form" className="hover:text-marathon-primary-blue transition-colors">İletişim</a>
           <Link

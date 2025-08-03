@@ -207,7 +207,7 @@ const Homepage = () => {
     },
     {
       text: 'MARATHON\'un kişiselleştirilmiş programları sayesinde ders çalışmak artık çok daha keyifli ve verimli. Kesinlikle tavsiye ederim!',
-      author: 'Can D., Öğrenci',
+      author: 'Hale D., Öğrenci',
       image: 'images/png-transparent-child-computer-icons-avatar-user-avatar-child-face-orange-thumbnail.png',
     },
     {
