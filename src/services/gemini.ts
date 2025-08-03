@@ -1,11 +1,13 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GeminiResponse } from '../types';
 
-const API_KEY = 'AIzaSyB3QFUEQ-hp_SgcYXMbzQ8Z-NGKtVWxQ2A';
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyAYmhEwxoP7-PCwDSlmz_BSSf9zilt6eUc';
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 export class GeminiService {
   private model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  private lastRequestTime = 0;
+  private readonly MIN_REQUEST_INTERVAL = 2000; // 2 saniye minimum aralık
 
   private cleanJsonResponse(text: string): string {
     // Remove markdown code blocks if present
@@ -159,7 +161,21 @@ export class GeminiService {
     questionTypes?: string[];
     studentProfile?: any;
   }): Promise<GeminiResponse> {
-    console.log('Generating exam with params:', params);
+    console.log('🚀 Generating exam with params:', params);
+    console.log('📡 API Key exists:', !!API_KEY);
+    console.log('🤖 Model initialized:', !!this.model);
+    
+    // Rate limiting kontrolü
+    const now = Date.now();
+    const timeSinceLastRequest = now - this.lastRequestTime;
+    
+    if (timeSinceLastRequest < this.MIN_REQUEST_INTERVAL) {
+      const waitTime = this.MIN_REQUEST_INTERVAL - timeSinceLastRequest;
+      console.log(`⏳ Rate limiting: ${waitTime}ms bekleniyor...`);
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+    }
+    
+    this.lastRequestTime = Date.now();
     
     try {
       const prompt = `
@@ -197,12 +213,16 @@ export class GeminiService {
         Sorular LGS formatında, 8. sınıf seviyesinde ve Türkiye müfredatına uygun olmalı.
       `;
 
-      console.log('Sending request to Gemini API...');
+      console.log('📤 Sending request to Gemini API...');
+      console.log('📝 Prompt length:', prompt.length);
+      
       const result = await this.model.generateContent(prompt);
       const response = result.response;
       const text = response.text();
 
-      console.log('Raw API response:', text);
+      console.log('📥 Raw API response received');
+      console.log('📊 Response length:', text?.length || 0);
+      console.log('📋 First 200 chars:', text?.substring(0, 200) || 'Empty response');
 
       // Check if response is empty or invalid
       if (!text || text.trim().length === 0) {
@@ -244,9 +264,11 @@ export class GeminiService {
     questionCount: number;
     difficulty: string;
   }): GeminiResponse {
-    console.log('Generating fallback exam for:', params.topic);
+    console.log('🔄 Generating fallback exam for:', params.topic);
+    console.log('📊 Requested question count:', params.questionCount);
     
     const fallbackQuestions = {
+      // Türkçe Konuları
       "Sözcükte Anlam ve Söz Varlığı": [
         {
           "soru_id": 1,
@@ -275,6 +297,143 @@ export class GeminiService {
           "ipucu": "Hangi sözcüğün başka bir sözcükten türediğini bulun."
         }
       ],
+      "Cümlede Anlam": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Aşağıdaki cümlelerin hangisinde abartı sanatı kullanılmıştır?",
+          "secenekler": {
+            "A": "Yağmur çok şiddetli yağıyor.",
+            "B": "Gökyüzünde bulutlar var.",
+            "C": "Aç aç kurt gibi baktı.",
+            "D": "Ses telleri çatladı."
+          },
+          "dogru_cevap": "D",
+          "cozum_metni": "'Ses telleri çatladı' ifadesi abartmalı bir anlatımdır. Gerçekte ses telleri çatlamaz.",
+          "ipucu": "Hangi ifade gerçekte mümkün olmayan bir durumu anlatıyor?"
+        }
+      ],
+      "Söz Sanatları": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Aşağıdakilerden hangisinde benzetme sanatı kullanılmıştır?",
+          "secenekler": {
+            "A": "Deniz gibi derin gözler",
+            "B": "Çok güzel bir şarkı",
+            "C": "Yağmur yağıyor",
+            "D": "Kitap okuyorum"
+          },
+          "dogru_cevap": "A",
+          "cozum_metni": "Gözlerin denize benzetilmesi, benzetme sanatının örneğidir.",
+          "ipucu": "Hangi cümlede iki şey karşılaştırılıyor?"
+        }
+      ],
+      "Paragrafta Anlam ve Yapı": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Bir paragrafın ana düşüncesi genellikle nerede bulunur?",
+          "secenekler": {
+            "A": "Sadece başta",
+            "B": "Sadece sonda", 
+            "C": "Başta veya sonda",
+            "D": "Her zaman ortada"
+          },
+          "dogru_cevap": "C",
+          "cozum_metni": "Ana düşünce genellikle paragrafın başında veya sonunda yer alır.",
+          "ipucu": "Ana düşünce hangi konumlarda olabilir?"
+        }
+      ],
+      "Metin Türleri": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Aşağıdakilerden hangisi öyküleyici metin türüdür?",
+          "secenekler": {
+            "A": "Deneme",
+            "B": "Hikaye",
+            "C": "Mektup",
+            "D": "Makale"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "Hikaye, olayları anlatan öyküleyici metin türüdür.",
+          "ipucu": "Hangi metin türünde olaylar anlatılır?"
+        }
+      ],
+      "Cümlenin Ögeleri": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Aşağıdaki cümlelerin hangisinde özne belirtisizdir?",
+          "secenekler": {
+            "A": "Kitabı masanın üzerine koydum.",
+            "B": "Kapıyı çaldılar.",
+            "C": "Öğretmen dersi anlattı.",
+            "D": "Çocuklar bahçede oynuyor."
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "'Çaldılar' fiilinin öznesi belli değildir, kim çaldığı belirtilmemiştir.",
+          "ipucu": "Hangi cümlede eylemi yapan belli değil?"
+        }
+      ],
+      "Fiilde Çatı": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Aşağıdakilerden hangisi edilgen çatılı fiildir?",
+          "secenekler": {
+            "A": "okudu",
+            "B": "okundu", 
+            "C": "okuyor",
+            "D": "okuyacak"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "'Okundu' fiili edilgen çatıdadır, eylem özne tarafından yapılmamıştır.",
+          "ipucu": "Hangi fiilde eylem özne tarafından yapılmıyor?"
+        }
+      ],
+      "Cümle Çeşitleri": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Aşağıdakilerden hangisi soru cümlesidir?",
+          "secenekler": {
+            "A": "Bugün hava çok güzel.",
+            "B": "Okula git!",
+            "C": "Sen neredesin?",
+            "D": "Keşke yağmur yağsa."
+          },
+          "dogru_cevap": "C",
+          "cozum_metni": "'Sen neredesin?' cümlesi soru işareti ile biten soru cümlesidir.",
+          "ipucu": "Hangi cümle soru işareti ile bitiyor?"
+        }
+      ],
+      "Yazım Kuralları": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Aşağıdakilerden hangisi doğru yazılmıştır?",
+          "secenekler": {
+            "A": "istanbul",
+            "B": "İstanbul",
+            "C": "ISTANBUL",
+            "D": "İSTANBUL"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "Özel isimlerin ilk harfi büyük yazılır.",
+          "ipucu": "Özel isimler nasıl yazılır?"
+        }
+      ],
+      "Noktalama İşaretleri": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Aşağıdakilerden hangisinde noktalama işareti doğru kullanılmıştır?",
+          "secenekler": {
+            "A": "Sen geldin, mi?",
+            "B": "Sen geldin mi,",
+            "C": "Sen geldin mi?",
+            "D": "Sen geldin. mi?"
+          },
+          "dogru_cevap": "C",
+          "cozum_metni": "Soru eki 'mi' ayrı yazılır ve cümle soru işareti ile biter.",
+          "ipucu": "Soru eki nasıl yazılır?"
+        }
+      ],
+
+      // Matematik Konuları
       "Çarpanlar ve Katlar": [
         {
           "soru_id": 1,
@@ -301,6 +460,242 @@ export class GeminiService {
           "dogru_cevap": "B",
           "cozum_metni": "12 = 2² × 3, 18 = 2 × 3². Ortak çarpanlar: 2 × 3 = 6",
           "ipucu": "EBOB, sayıların ortak çarpanlarının en büyüğüdür."
+        },
+        {
+          "soru_id": 3,
+          "soru_metni": "EKOK(6, 8) = ?",
+          "secenekler": {
+            "A": "12",
+            "B": "24",
+            "C": "36",
+            "D": "48"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "6 = 2 × 3, 8 = 2³. EKOK = 2³ × 3 = 24",
+          "ipucu": "EKOK, sayıların katları arasındaki en küçük ortak kat."
+        },
+        {
+          "soru_id": 4,
+          "soru_metni": "36 sayısının asal çarpanları toplamı kaçtır?",
+          "secenekler": {
+            "A": "5",
+            "B": "7",
+            "C": "9",
+            "D": "11"
+          },
+          "dogru_cevap": "A",
+          "cozum_metni": "36 = 2² × 3², asal çarpanları 2 ve 3. Toplam: 2 + 3 = 5",
+          "ipucu": "Asal çarpan aynı olsa bile sadece bir kez sayılır."
+        },
+        {
+          "soru_id": 5,
+          "soru_metni": "48 ve 72'nin EBOB'u kaçtır?",
+          "secenekler": {
+            "A": "12",
+            "B": "18",
+            "C": "24",
+            "D": "36"
+          },
+          "dogru_cevap": "C",
+          "cozum_metni": "48 = 2⁴ × 3, 72 = 2³ × 3². EBOB = 2³ × 3 = 24",
+          "ipucu": "Ortak çarpanların en küçük kuvvetlerini alın."
+        }
+      ],
+      "Üslü İfadeler": [
+        {
+          "soru_id": 1,
+          "soru_metni": "2⁴ işleminin sonucu kaçtır?",
+          "secenekler": {
+            "A": "8",
+            "B": "16",
+            "C": "32",
+            "D": "64"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "2⁴ = 2 × 2 × 2 × 2 = 16",
+          "ipucu": "2'yi 4 kez çarpın."
+        }
+      ],
+      "Kareköklü İfadeler": [
+        {
+          "soru_id": 1,
+          "soru_metni": "√16 kaçtır?",
+          "secenekler": {
+            "A": "2",
+            "B": "4",
+            "C": "8",
+            "D": "16"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "√16 = 4, çünkü 4² = 16",
+          "ipucu": "Hangi sayının karesi 16'dır?"
+        }
+      ],
+      "Veri Analizi": [
+        {
+          "soru_id": 1,
+          "soru_metni": "5, 8, 12, 15, 20 sayılarının aritmetik ortalaması kaçtır?",
+          "secenekler": {
+            "A": "10",
+            "B": "12",
+            "C": "14",
+            "D": "15"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "Aritmetik ortalama = (5+8+12+15+20)/5 = 60/5 = 12",
+          "ipucu": "Tüm sayıları toplayıp kaç tane olduğuna bölün."
+        }
+      ],
+      "Olasılık": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Bir zarın atılmasında çift sayı gelme olasılığı nedir?",
+          "secenekler": {
+            "A": "1/6",
+            "B": "1/3",
+            "C": "1/2",
+            "D": "2/3"
+          },
+          "dogru_cevap": "C",
+          "cozum_metni": "Zarda çift sayılar 2, 4, 6'dır. 3 çift sayı / 6 toplam sayı = 1/2",
+          "ipucu": "Zarda kaç tane çift sayı var?"
+        }
+      ],
+      "Cebirsel İfadeler ve Özdeşlikler": [
+        {
+          "soru_id": 1,
+          "soru_metni": "3x + 5 = 14 denkleminde x kaçtır?",
+          "secenekler": {
+            "A": "2",
+            "B": "3",
+            "C": "4",
+            "D": "5"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "3x + 5 = 14 → 3x = 14 - 5 → 3x = 9 → x = 3",
+          "ipucu": "Önce 5'i sağ tarafa geçirin."
+        }
+      ],
+      "Doğrusal Denklemler": [
+        {
+          "soru_id": 1,
+          "soru_metni": "2x - 3 = 7 denkleminin çözümü kaçtır?",
+          "secenekler": {
+            "A": "4",
+            "B": "5",
+            "C": "6",
+            "D": "7"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "2x - 3 = 7 → 2x = 10 → x = 5",
+          "ipucu": "Önce 3'ü sağ tarafa geçirin."
+        }
+      ],
+      "Eşitsizlikler": [
+        {
+          "soru_id": 1,
+          "soru_metni": "x + 3 > 7 eşitsizliğini sağlayan en küçük tam sayı kaçtır?",
+          "secenekler": {
+            "A": "4",
+            "B": "5",
+            "C": "6",
+            "D": "7"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "x + 3 > 7 → x > 4, bu durumda en küçük tam sayı 5'tir.",
+          "ipucu": "x > 4 olduğunda hangi en küçük tam sayı bu koşulu sağlar?"
+        }
+      ],
+      "Üçgenler": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Bir üçgenin iç açıları toplamı kaç derecedir?",
+          "secenekler": {
+            "A": "90°",
+            "B": "180°",
+            "C": "270°",
+            "D": "360°"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "Herhangi bir üçgenin iç açıları toplamı her zaman 180°'dir.",
+          "ipucu": "Bu temel geometri kuralıdır."
+        }
+      ],
+      "Eşlik ve Benzerlik": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Eş üçgenlerde hangi özellik vardır?",
+          "secenekler": {
+            "A": "Sadece açıları eşittir",
+            "B": "Sadece kenarları eşittir",
+            "C": "Hem kenarları hem açıları eşittir",
+            "D": "Hiçbiri eşit değildir"
+          },
+          "dogru_cevap": "C",
+          "cozum_metni": "Eş üçgenlerde tüm karşılıklı kenarlar ve açılar eşittir.",
+          "ipucu": "Eşlik kavramını düşünün."
+        }
+      ],
+      "Dönüşüm Geometrisi": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Bir şeklin ötelemesi sırasında hangi özelliği değişmez?",
+          "secenekler": {
+            "A": "Konumu",
+            "B": "Şekli ve boyutu",
+            "C": "Yönü",
+            "D": "Rengi"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "Öteleme işleminde şeklin boyutu ve şekli değişmez, sadece konumu değişir.",
+          "ipucu": "Öteleme bir şekli kaydırmaktır."
+        }
+      ],
+      "Katı Cisimler": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Küpün kaç yüzeyi vardır?",
+          "secenekler": {
+            "A": "4",
+            "B": "6",
+            "C": "8",
+            "D": "12"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "Küpün 6 yüzeyi vardır: ön, arka, sağ, sol, üst, alt.",
+          "ipucu": "Küpün her yönünde bir yüzey vardır."
+        }
+      ],
+
+      // Fen Bilimleri Konuları
+      "Mevsimler ve İklim": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Mevsimlerin oluşmasının temel nedeni nedir?",
+          "secenekler": {
+            "A": "Dünya'nın kendi ekseni etrafında dönmesi",
+            "B": "Dünya'nın eksen eğikliği",
+            "C": "Güneş'e olan uzaklık",
+            "D": "Ay'ın çekim etkisi"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "Dünya'nın ekseni 23.5° eğik olduğu için mevsimler oluşur.",
+          "ipucu": "Dünya'nın ekseni düz değildir, eğiktir."
+        }
+      ],
+      "DNA ve Genetik Kod": [
+        {
+          "soru_id": 1,
+          "soru_metni": "DNA'nın açılımı nedir?",
+          "secenekler": {
+            "A": "Deoksiribo Nükleik Asit",
+            "B": "Dizi Nükleik Asit",
+            "C": "Doğal Nükleik Asit",
+            "D": "Düzenli Nükleik Asit"
+          },
+          "dogru_cevap": "A",
+          "cozum_metni": "DNA, Deoksiribo Nükleik Asit'in kısaltmasıdır.",
+          "ipucu": "DNA'nın İngilizce açılımını düşünün."
         }
       ],
       "Basınç": [
@@ -318,25 +713,304 @@ export class GeminiService {
           "ipucu": "Bıçağın neden keskin olduğunu düşünün."
         }
       ],
-      "Cümlede Anlam": [
+      "Madde ve Endüstri": [
         {
           "soru_id": 1,
-          "soru_metni": "Aşağıdaki cümlelerin hangisinde abartı sanatı kullanılmıştır?",
+          "soru_metni": "Maddenin en küçük yapı taşı nedir?",
           "secenekler": {
-            "A": "Yağmur çok şiddetli yağıyor.",
-            "B": "Gökyüzünde bulutlar var.",
-            "C": "Aç aç kurt gibi baktı.",
-            "D": "Ses telleri çatladı."
+            "A": "Molekül",
+            "B": "Atom",
+            "C": "Proton",
+            "D": "Elektron"
           },
-          "dogru_cevap": "D",
-          "cozum_metni": "'Ses telleri çatladı' ifadesi abartmalı bir anlatımdır. Gerçekte ses telleri çatlamaz.",
-          "ipucu": "Hangi ifade gerçekte mümkün olmayan bir durumu anlatıyor?"
+          "dogru_cevap": "B",
+          "cozum_metni": "Maddenin en küçük yapı taşı atomdur.",
+          "ipucu": "En temel parçacığı düşünün."
+        }
+      ],
+      "Basit Makineler": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Aşağıdakilerden hangisi basit makine örneğidir?",
+          "secenekler": {
+            "A": "Bilgisayar",
+            "B": "Kaldıraç",
+            "C": "Araba",
+            "D": "Telefon"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "Kaldıraç, en temel basit makinelerden biridir.",
+          "ipucu": "En basit mekanik aletleri düşünün."
+        }
+      ],
+      "Enerji Dönüşümleri": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Elektrik enerjisi hangi enerji türünden üretilir?",
+          "secenekler": {
+            "A": "Sadece kinetik enerji",
+            "B": "Sadece kimyasal enerji",
+            "C": "Çeşitli enerji türlerinden",
+            "D": "Sadece ısı enerjisi"
+          },
+          "dogru_cevap": "C",
+          "cozum_metni": "Elektrik enerjisi kinetik, kimyasal, nükleer, güneş enerjisi gibi birçok enerji türünden üretilebilir.",
+          "ipucu": "Farklı elektrik santrallerini düşünün."
+        }
+      ],
+      "Elektrik Yükleri ve Elektrik Enerjisi": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Elektrik akımının birimi nedir?",
+          "secenekler": {
+            "A": "Volt",
+            "B": "Amper",
+            "C": "Ohm",
+            "D": "Watt"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "Elektrik akımının birimi Amper'dir.",
+          "ipucu": "Akım şiddetini ölçen birim."
+        }
+      ],
+      "Canlılar ve Enerji İlişkileri": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Fotosentez olayında hangi gaz açığa çıkar?",
+          "secenekler": {
+            "A": "Karbondioksit",
+            "B": "Oksijen",
+            "C": "Azot",
+            "D": "Hidrojen"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "Fotosentez sırasında oksijen gazı açığa çıkar.",
+          "ipucu": "Bitkiler hangi gazı üretir?"
+        }
+      ],
+
+      // İnkılap Tarihi ve Atatürkçülük Konuları
+      "Bir Kahraman Doğuyor": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Mustafa Kemal Atatürk hangi yılda doğmuştur?",
+          "secenekler": {
+            "A": "1880",
+            "B": "1881",
+            "C": "1882",
+            "D": "1883"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "Mustafa Kemal Atatürk 1881 yılında doğmuştur.",
+          "ipucu": "19. yüzyılın sonları."
+        }
+      ],
+      "Millî Uyanış: Bağımsızlık Yolunda Atılan Adımlar": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Millî Mücadele'nin başlangıç tarihi kabul edilen olay nedir?",
+          "secenekler": {
+            "A": "Mondros Ateşkes Antlaşması",
+            "B": "19 Mayıs 1919'da Samsun'a çıkış",
+            "C": "Erzurum Kongresi",
+            "D": "Sivas Kongresi"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "19 Mayıs 1919'da Mustafa Kemal'in Samsun'a çıkışı Millî Mücadele'nin başlangıcı kabul edilir.",
+          "ipucu": "Önemli bir 19 Mayıs tarihi."
+        }
+      ],
+      "Millî Bir Destan: Ya İstiklal Ya Ölüm!": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Kurtuluş Savaşı'nın son zaferiyeti hangi savaştır?",
+          "secenekler": {
+            "A": "Sakarya Savaşı",
+            "B": "İnönü Savaşları",
+            "C": "Büyük Taarruz",
+            "D": "Dumlupınar Savaşı"
+          },
+          "dogru_cevap": "C",
+          "cozum_metni": "26 Ağustos 1922'de başlayan Büyük Taarruz, Kurtuluş Savaşı'nın son zaferidir.",
+          "ipucu": "1922 yılındaki büyük askeri operasyon."
+        }
+      ],
+      "Atatürkçülük ve Çağdaşlaşan Türkiye": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Atatürk'ün ilkelerinden hangisi 'halka rağmen halk için' anlayışını reddeder?",
+          "secenekler": {
+            "A": "Cumhuriyetçilik",
+            "B": "Halkçılık",
+            "C": "Devletçilik",
+            "D": "Laiklik"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "Halkçılık ilkesi 'halka rağmen halk için' değil, 'halk için halkla beraber' anlayışını benimser.",
+          "ipucu": "Hangi ilke doğrudan halkla ilgilidir?"
+        }
+      ],
+
+      // Din Kültürü ve Ahlak Bilgisi Konuları
+      "Kader İnancı": [
+        {
+          "soru_id": 1,
+          "soru_metni": "İslam dininde kader inancının temel ilkesi nedir?",
+          "secenekler": {
+            "A": "Her şeyin tesadüf olması",
+            "B": "Allah'ın her şeyi bilmesi ve takdir etmesi",
+            "C": "İnsanın hiç sorumluluğu olmaması",
+            "D": "Sadece kötü olayların kader olması"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "Kader, Allah'ın her şeyi önceden bilmesi ve takdir etmesi anlamına gelir.",
+          "ipucu": "Allah'ın sıfatlarını düşünün."
+        }
+      ],
+      "Zekât, Sadaka ve Hac": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Zekât İslam dininin kaçıncı şartıdır?",
+          "secenekler": {
+            "A": "Birinci",
+            "B": "İkinci",
+            "C": "Üçüncü",
+            "D": "Dördüncü"
+          },
+          "dogru_cevap": "C",
+          "cozum_metni": "Zekât İslam'ın beş şartından üçüncüsüdür.",
+          "ipucu": "İslam'ın beş şartını sırayla düşünün."
+        }
+      ],
+      "Din ve Hayat": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Din ve günlük hayat arasındaki ilişki nasıl olmalıdır?",
+          "secenekler": {
+            "A": "Tamamen ayrı olmalı",
+            "B": "Sadece ibadet zamanında bir arada olmalı",
+            "C": "Hayatın her alanında birlikte olmalı",
+            "D": "Sadece özel günlerde birlikte olmalı"
+          },
+          "dogru_cevap": "C",
+          "cozum_metni": "Din, hayatın her alanında rehberlik eden bir yaşam biçimidir.",
+          "ipucu": "Dinin kapsamını düşünün."
+        }
+      ],
+      "Hz. Muhammed'in Örnekliği": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Hz. Muhammed'in en önemli özelliklerinden biri nedir?",
+          "secenekler": {
+            "A": "Sadece dini konularda örnek olması",
+            "B": "Sadece savaşlarda cesur olması",
+            "C": "Hayatın her alanında örnek olması",
+            "D": "Sadece ailevi konularda örnek olması"
+          },
+          "dogru_cevap": "C",
+          "cozum_metni": "Hz. Muhammed hayatın her alanında Müslümanlara örnek olan bir peygamberdir.",
+          "ipucu": "Peygamberin örnek oluş kapsamını düşünün."
+        }
+      ],
+
+      // İngilizce Konuları
+      "Friendship": [
+        {
+          "soru_id": 1,
+          "soru_metni": "What is the past tense of 'meet'?",
+          "secenekler": {
+            "A": "meeted",
+            "B": "met",
+            "C": "meet",
+            "D": "meeting"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "'Meet' fiilinin geçmiş hali 'met'tir.",
+          "ipucu": "Bu düzensiz bir fiildir."
+        }
+      ],
+      "Teen Life": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Which one is correct?",
+          "secenekler": {
+            "A": "I am 14 years old.",
+            "B": "I have 14 years old.",
+            "C": "I am 14 years.",
+            "D": "I have 14 years."
+          },
+          "dogru_cevap": "A",
+          "cozum_metni": "Yaş belirtirken 'I am ... years old' yapısı kullanılır.",
+          "ipucu": "Yaş söylerken hangi yapı kullanılır?"
+        }
+      ],
+      "In the Kitchen": [
+        {
+          "soru_id": 1,
+          "soru_metni": "Which one is a kitchen utensil?",
+          "secenekler": {
+            "A": "Book",
+            "B": "Spoon",
+            "C": "Chair",
+            "D": "Computer"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "Spoon (kaşık) bir mutfak eşyasıdır.",
+          "ipucu": "Mutfakta kullanılan eşyayı bulun."
+        }
+      ],
+      "On the Phone": [
+        {
+          "soru_id": 1,
+          "soru_metni": "How do you answer the phone in English?",
+          "secenekler": {
+            "A": "Hello",
+            "B": "Goodbye",
+            "C": "Thank you",
+            "D": "Sorry"
+          },
+          "dogru_cevap": "A",
+          "cozum_metni": "Telefonu açarken 'Hello' deriz.",
+          "ipucu": "Selamlama ifadesi."
+        }
+      ],
+      "The Internet": [
+        {
+          "soru_id": 1,
+          "soru_metni": "What do you need to access the internet?",
+          "secenekler": {
+            "A": "Only a computer",
+            "B": "Only a phone",
+            "C": "A device and internet connection",
+            "D": "Only books"
+          },
+          "dogru_cevap": "C",
+          "cozum_metni": "İnternete erişmek için bir cihaz ve internet bağlantısı gerekir.",
+          "ipucu": "İki şeye ihtiyaç var."
+        }
+      ],
+      "Adventures": [
+        {
+          "soru_id": 1,
+          "soru_metni": "What is an adventure?",
+          "secenekler": {
+            "A": "A boring activity",
+            "B": "An exciting experience",
+            "C": "A sleeping time",
+            "D": "A homework"
+          },
+          "dogru_cevap": "B",
+          "cozum_metni": "Adventure heyecan verici bir deneyim anlamına gelir.",
+          "ipucu": "Macera ne demektir?"
         }
       ]
     };
 
-    const topicQuestions = fallbackQuestions[params.topic as keyof typeof fallbackQuestions] || fallbackQuestions["Çarpanlar ve Katlar"];
-    const selectedQuestions = topicQuestions.slice(0, Math.min(params.questionCount, topicQuestions.length));
+    // Seçilen konuya ait soruları bul, yoksa varsayılan sorular kullan  
+    const topicQuestions = fallbackQuestions[params.topic as keyof typeof fallbackQuestions] || this.getDefaultQuestions(params.topic);
+    
+    // İstenen soru sayısı kadar soru seç
+    const selectedQuestions = this.selectQuestions(topicQuestions, params.questionCount);
 
     const fallbackData = {
       "sinav_basligi": `${params.topic} - ${params.difficulty} Seviye Sınav`,
@@ -346,6 +1020,110 @@ export class GeminiService {
     };
 
     return { success: true, data: fallbackData };
+  }
+
+  // Varsayılan sorular oluştur (konu bulunamadığında)
+  private getDefaultQuestions(topic: string): any[] {
+    return [
+      {
+        "soru_id": 1,
+        "soru_metni": `${topic} konusunda temel bilgi sorusu 1`,
+        "secenekler": {
+          "A": "Seçenek A",
+          "B": "Seçenek B", 
+          "C": "Seçenek C",
+          "D": "Seçenek D"
+        },
+        "dogru_cevap": "A",
+        "cozum_metni": `${topic} konusuna dair temel açıklama`,
+        "ipucu": "Konuyu gözden geçirin"
+      },
+      {
+        "soru_id": 2,
+        "soru_metni": `${topic} konusunda temel bilgi sorusu 2`,
+        "secenekler": {
+          "A": "Seçenek A",
+          "B": "Seçenek B",
+          "C": "Seçenek C", 
+          "D": "Seçenek D"
+        },
+        "dogru_cevap": "B",
+        "cozum_metni": `${topic} konusuna dair temel açıklama`,
+        "ipucu": "Konuyu gözden geçirin"
+      },
+      {
+        "soru_id": 3,
+        "soru_metni": `${topic} konusunda temel bilgi sorusu 3`,
+        "secenekler": {
+          "A": "Seçenek A",
+          "B": "Seçenek B",
+          "C": "Seçenek C", 
+          "D": "Seçenek D"
+        },
+        "dogru_cevap": "C",
+        "cozum_metni": `${topic} konusuna dair temel açıklama`,
+        "ipucu": "Konuyu gözden geçirin"
+      }
+    ];
+  }
+
+  // Soru seçimi yap (istenen sayı kadar) - tekrar etmeyen çeşitli sorular
+  private selectQuestions(questions: any[], requestedCount: number): any[] {
+    const selectedQuestions = [];
+    
+    for (let i = 0; i < requestedCount; i++) {
+      const questionIndex = i % questions.length;
+      const baseQuestion = questions[questionIndex];
+      
+      // Temel soruyu kopyala ve çeşitle
+      const question = { ...baseQuestion };
+      question.soru_id = i + 1;
+      
+      // Eğer aynı soru tekrar ediyorsa, soruyu çeşitle
+      if (i >= questions.length) {
+        question.soru_metni = this.generateVariation(baseQuestion.soru_metni, Math.floor(i / questions.length) + 1);
+        question.secenekler = this.generateOptionVariations(baseQuestion.secenekler, Math.floor(i / questions.length) + 1);
+      }
+      
+      selectedQuestions.push(question);
+    }
+    
+    return selectedQuestions;
+  }
+
+  // Soru metnini çeşitlendirmek için
+  private generateVariation(originalQuestion: string, variationNumber: number): string {
+    const variations = [
+      originalQuestion,
+      originalQuestion.replace(/Aşağıdaki/g, 'Verilen').replace(/hangisi/g, 'hangisinin'),
+      originalQuestion.replace(/Hangi/g, 'Aşağıdakilerden hangi'),
+      originalQuestion.replace(/nedir/g, 'ne olabilir'),
+      originalQuestion.replace(/kaçtır/g, 'kaça eşittir'),
+      originalQuestion.replace(/nasıldır/g, 'nasıl olur')
+    ];
+    
+    return variations[variationNumber % variations.length] || originalQuestion;
+  }
+
+  // Seçenekleri çeşitlendirmek için
+  private generateOptionVariations(originalOptions: any, variationNumber: number): any {
+    // Basit seçenek karıştırma ve değiştirme
+    const options = { ...originalOptions };
+    
+    if (variationNumber > 1) {
+      // Seçenekleri biraz değiştir
+      Object.keys(options).forEach(key => {
+        if (typeof options[key] === 'string') {
+          options[key] = options[key]
+            .replace(/çok/g, 'oldukça')
+            .replace(/büyük/g, 'kocaman')
+            .replace(/küçük/g, 'minik')
+            .replace(/hızlı/g, 'süratli');
+        }
+      });
+    }
+    
+    return options;
   }
 
   private generateFallbackLesson(params: {
