@@ -365,9 +365,14 @@ export class EyeTrackingService {
         }
       });
       
-      // Önizleme video elementi oluştur (büyük ve belirgin)
+      // Önizleme video elementi oluştur
       if (!this.previewElement) {
         this.previewElement = document.createElement('video');
+        this.previewElement.muted = true;
+        this.previewElement.autoplay = true;
+        this.previewElement.playsInline = true;
+        
+        // Floating kamera preview (sağ üst köşe)
         this.previewElement.style.cssText = `
           position: fixed;
           top: 80px;
@@ -382,9 +387,6 @@ export class EyeTrackingService {
           box-shadow: 0 8px 24px rgba(0,0,0,0.4);
           transform: scaleX(-1);
         `;
-        this.previewElement.muted = true;
-        this.previewElement.autoplay = true;
-        this.previewElement.playsInline = true;
         
         // Preview için başlık ekle
         const title = document.createElement('div');
@@ -424,8 +426,12 @@ export class EyeTrackingService {
         document.body.appendChild(title);
         document.body.appendChild(statusIndicator);
         
-        // Metrik görüntüleme paneli oluştur
-        this.createMetricsDisplay();
+        console.log('✅ Camera preview added to main screen (floating mode)');
+        
+        // Metrik görüntüleme paneli oluştur (eğer yoksa)
+        if (!this.metricsDisplay) {
+          this.createMetricsDisplay();
+        }
         
         // Overlay canvas oluştur (pupil tracking'i göstermek için)
         this.createOverlayCanvas();
@@ -489,6 +495,19 @@ export class EyeTrackingService {
     // Tracking loop'u başlat
     this.isTracking = true;
     this.trackingStartTime = performance.now();
+    
+    // Preview modunda geçici session data oluştur
+    this.sessionData = {
+      userId: 'preview-user',
+      sessionId: 'preview-session-' + Date.now(),
+      startTime: new Date().toISOString(),
+      endTime: new Date().toISOString(),
+      totalFocusTime: 0,
+      totalDistractionTime: 0,
+      attentionScore: 0,
+      averageGazeStability: 0,
+      distractionEvents: []
+    };
     
     console.log('🔄 Starting preview tracking loop...');
     
@@ -1648,9 +1667,14 @@ private createOverlayCanvas(): void {
         document.body.appendChild(this.canvasElement);
       }
       
-      // Önizleme video elementi oluştur (küçük kamera penceresi)
+      // Önizleme video elementi oluştur
       if (!this.previewElement) {
         this.previewElement = document.createElement('video');
+        this.previewElement.muted = true;
+        this.previewElement.autoplay = true;
+        this.previewElement.playsInline = true;
+        
+        // Floating kamera preview (sağ üst köşe)
         this.previewElement.style.cssText = `
           position: fixed;
           top: 80px;
@@ -1665,9 +1689,6 @@ private createOverlayCanvas(): void {
           box-shadow: 0 4px 12px rgba(0,0,0,0.3);
           transform: scaleX(-1);
         `;
-        this.previewElement.muted = true;
-        this.previewElement.autoplay = true;
-        this.previewElement.playsInline = true;
         
         // Preview için overlay ekle
         const overlay = document.createElement('div');
@@ -1712,6 +1733,8 @@ private createOverlayCanvas(): void {
         document.body.appendChild(overlay);
         document.body.appendChild(this.previewElement);
         document.body.appendChild(statusIndicator);
+        
+        console.log('✅ Camera preview added to main screen (floating)');
         
         console.log('✅ Camera preview element created and added to DOM');
       }

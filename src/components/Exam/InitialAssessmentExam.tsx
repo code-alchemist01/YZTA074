@@ -80,13 +80,13 @@ export const InitialAssessmentExam: React.FC<InitialAssessmentExamProps> = ({
 
   // Göz takibi etkinleştirildiğinde kamera önizlemesini başlat
   useEffect(() => {
-    if (isEyeTrackingEnabled && cameraPermission && !examStarted) {
+    if (isEyeTrackingEnabled && cameraPermission) {
       startCameraPreview();
     } else if (!isEyeTrackingEnabled) {
       // Göz takibi kapatıldığında preview'ı kapat
       eyeTrackingService.stopCameraPreview();
     }
-  }, [isEyeTrackingEnabled, cameraPermission, examStarted]);
+  }, [isEyeTrackingEnabled, cameraPermission]);
 
   const initializeExam = async () => {
     try {
