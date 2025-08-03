@@ -158,4 +158,69 @@ Geliştirilmesi Gereken Yönlerimiz
 
 * Ekip üyeleri, gelecek sprintlerde daha proaktif ve zaman yönetimi konusunda daha dikkatli olmalı.
 
+# Sprint 3
+Sprint Notları: Bu sprint süresince ekip olarak çok iyi bir iletişim kurulmuş, herkes aktif bir şekilde projeye katkı sağlamıştır. Bu süreçte, projenin kapsamına görüntü işleme özelliği eklenmiş, kullanıcı panelinde önemli düzenlemeler yapılmış ve yeni özellikler için backend bağlantıları başarıyla entegre edilmiştir. Ekibin yüksek motivasyonu ve uyumlu çalışması sayesinde hedeflere başarıyla ulaşılmıştır.
+
+Daily Scrum toplantıları ağırlıklı olarak Google Meet ve WhatsApp platformları üzerinden gerçekleştirilmiştir. Her hafta düzenli olarak birden fazla toplantı yapılmış ve proje süreci boyunca ekip üyeleri aktif bir şekilde iletişim halinde kalmıştır. WhatsApp grubu, proje kapsamında yapılan çalışmaların paylaşılması ve anlık bilgilendirme için etkin biçimde kullanılmıştır.
+
+[Daily Scrum Meets](https://docs.google.com/document/d/1aTv73zg42YbnOIQAJBYyZqiyoRGqHj8VE_DRAAhg6xM/edit?usp=sharing)
+
+# Product Backlog URL
+
+Tüm proje planlama ve görev takibi süreçlerimizi Trello ve Google Meet üzerinde meeting gerçekleştirerek yaptık.
+
+[YZTA074 Trello Backlog Board - Sprint 3](https://trello.com/b/PE8u7mp7/yz74-backlog-board)
+
+<img width="1512" height="735" alt="Screenshot 2025-08-03 at 14 04 26" src="https://github.com/user-attachments/assets/7e31acd4-a802-4bfc-8ba7-9f9af98793b2" />
+
+# Projenin Son Durumu
+
+Projenin son durumunu gösteren fotoğraflar Google Drive üzerinde depolanmıştır.
+
+[Project View](https://drive.google.com/drive/folders/1fJCsZKqqchfcUC4ePcwOKe8qU3Vjc_OV?usp=sharing)
+
+
+# Sprint Review
+Sprint 3'ün sonunda ekip üyeleriyle bir araya gelinerek Sprint Review toplantısı gerçekleştirilmiştir. Bu sprintte belirlenen tüm hedeflere başarıyla ulaşılmıştır.
+
+Toplam Puan: 120
+
+Sprint süresince ekip, hedeflenen görevleri başarıyla tamamlamış ve projenin önemli bir kısmında ilerleme kaydetmiştir. Özellikle ekip içi iletişimin çok iyi seviyede olması, verimli bir çalışma ortamı sağlamıştır.
+
+Bu sprintte, projenin görüntü işleme kısmına odaklanılmış ve kullanıcı paneli üzerinde kapsamlı düzenlemeler yapılmıştır. Bu kapsamda şu çalışmalar gerçekleştirilmiştir:
+
+* Görüntü işleme yetenekleri projeye entegre edilmiştir.
+
+* Kullanıcı panelinde kapsamlı düzenlemeler ve iyileştirmeler yapılmıştır.
+
+* Yeni eklenen özellikler ve yapılan değişiklikler için yeni backend bağlantıları kurulmuş ve test edilmiştir.
+
+* Projenin genel performansını ve kullanıcı deneyimini artıracak çeşitli optimizasyonlar gerçekleştirilmiştir.
+
+Sprint Review Aktif Katılımcıları:
+
+İbrahim Kutay Şahin, Bedirhan Örseloğlu, Kerem Akkale, Hidayet Sare Budak, Damla Nur Özcan (Katılımcı listesini güncelleyebilirsiniz)
+
+# Sprint Retrospective
+
+Güçlü Yönlerimiz
+
+* Ekip içi iletişim çok iyi seviyedeydi ve tüm üyeler aktif bir şekilde katkı sağladı.
+
+* Daily Scrum toplantıları düzenli ve verimli şekilde Google Meet ve WhatsApp üzerinden yürütüldü.
+
+* Görüntü işleme entegrasyonu gibi kritik yeni özellikler başarıyla eklendi.
+
+* Kullanıcı paneli düzenlemeleri ve yeni backend bağlantıları sorunsuz bir şekilde tamamlandı.
+
+* Sprint hedeflerine başarıyla ulaşıldı, görevler zamanında tamamlandı.
+
+Geliştirilmesi Gereken Yönlerimiz
+
+* Daha karmaşık test senaryoları üzerinde çalışmak.
+  
+* Dokümantasyon süreçlerini daha detaylı hale getirmek
+
+
+
 
