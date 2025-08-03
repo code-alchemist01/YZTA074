@@ -199,7 +199,7 @@ Bu sprintte, projenin görüntü işleme kısmına odaklanılmış ve kullanıc�
 
 Sprint Review Aktif Katılımcıları:
 
-İbrahim Kutay Şahin, Bedirhan Örseloğlu, Kerem Akkale, Hidayet Sare Budak, Damla Nur Özcan (Katılımcı listesini güncelleyebilirsiniz)
+İbrahim Kutay Şahin, Bedirhan Örseloğlu, Kerem Akkale, Hidayet Sare Budak, Damla Nur Özcan
 
 # Sprint Retrospective
 
