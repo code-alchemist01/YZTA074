@@ -221,6 +221,23 @@ Geliştirilmesi Gereken Yönlerimiz
   
 * Dokümantasyon süreçlerini daha detaylı hale getirmek
 
+# Proje Kodunun Çalışma Prensibi
 
+Backend klasöründe .env dosyası oluşturduktan sonra aşağıdaki bilgileri bu dosyaya kaydedin:
+
+MYSQL_HOST=switchback.proxy.rlwy.net
+MYSQL_PORT=44851
+MYSQL_USER=root
+MYSQL_PASSWORD=PSuSOmKujuwJwEKqtSufugqHfgFxnTuD
+
+Daha sonra terminalinizde sırayla aşağıdaki komutları girin:
+
+cd marathon-backend; uvicorn main:app --reload 
+
+cd YZTA074-master; npm install
+
+npm run dev 
+
+Not: Projenin hem backend hem de frontend kısımlarının doğru şekilde çalışması için her iki sunucunun da aynı anda aktif olması gerektiğini unutmayın.
 
 
