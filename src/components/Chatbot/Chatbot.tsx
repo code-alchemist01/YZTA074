@@ -27,7 +27,34 @@ const Chatbot: React.FC = () => {
     }
   }, [isOpen, messages.length]);
 
-  // Simüle edilmiş Gemini yanıtı veren fonksiyon
+  // Gerçek Gemini yanıtı veren fonksiyon
+  const getGeminiResponse = async (userInput: string): Promise<string> => {
+    try {
+      console.log('🤖 Chatbot: Gemini servisi çağrılıyor...', userInput);
+      
+      // Gemini servisini import et
+      const { geminiService } = await import('../../services/gemini');
+      
+      const response = await geminiService.generateMentorResponse({
+        studentQuestion: userInput,
+        studentProfile: { firstName: 'Arkadaş', grade: '8', learningStyle: ['Görsel', 'İşitsel'] },
+        chatHistory: messages.slice(-3) // Son 3 mesaj
+      });
+
+      if (response.success) {
+        console.log('✅ Chatbot: Gemini yanıtı başarılı');
+        return response.data.mentor_cevabi;
+      } else {
+        console.log('❌ Chatbot: Gemini yanıtı başarısız, fallback kullanılıyor');
+        return getSimulatedGeminiResponse(userInput);
+      }
+    } catch (error) {
+      console.error('❌ Chatbot: Gemini hatası:', error);
+      return getSimulatedGeminiResponse(userInput);
+    }
+  };
+
+  // Simüle edilmiş Gemini yanıtı veren fonksiyon (fallback için)
   const getSimulatedGeminiResponse = (userMessage: string): string => {
     const lowerCaseMessage = userMessage.toLowerCase();
 
@@ -100,11 +127,15 @@ const Chatbot: React.FC = () => {
     setInput('');
     setIsLoading(true);
 
-    // Simüle edilmiş yanıtı bekle (daha doğal bir gecikme için)
-    await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 1200)); // 0.8 ile 2 saniye arası rastgele bekleme
-
-    const simulatedResponse = getSimulatedGeminiResponse(userMessage.text);
-    setMessages((prevMessages) => [...prevMessages, { role: 'model', text: simulatedResponse }]);
+    // Gerçek Gemini yanıtını al
+    try {
+      const geminiResponse = await getGeminiResponse(userMessage.text);
+      setMessages((prevMessages) => [...prevMessages, { role: 'model', text: geminiResponse }]);
+    } catch (error) {
+      console.error('Chatbot error:', error);
+      const fallbackResponse = getSimulatedGeminiResponse(userMessage.text);
+      setMessages((prevMessages) => [...prevMessages, { role: 'model', text: fallbackResponse }]);
+    }
 
     setIsLoading(false);
   };

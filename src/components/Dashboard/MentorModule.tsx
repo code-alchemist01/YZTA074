@@ -41,13 +41,16 @@ export const MentorModule: React.FC<MentorModuleProps> = ({ user }) => {
     setLoading(true);
 
     try {
+      console.log('🚀 MentorModule: Gemini servisi çağrılıyor...', inputText);
       const response = await geminiService.generateMentorResponse({
         studentQuestion: inputText,
         studentProfile: user,
         chatHistory: messages.slice(-5) // Last 5 messages for context
       });
+      console.log('📥 MentorModule: Gemini yanıtı alındı:', response);
 
       if (response.success) {
+        console.log('✅ MentorModule: Başarılı yanıt alındı');
         const mentorMessage: Message = {
           id: (Date.now() + 1).toString(),
           text: response.data.mentor_cevabi,
@@ -57,6 +60,7 @@ export const MentorModule: React.FC<MentorModuleProps> = ({ user }) => {
 
         setMessages(prev => [...prev, mentorMessage]);
       } else {
+        console.log('❌ MentorModule: Başarısız yanıt:', response.error);
         const errorMessage: Message = {
           id: (Date.now() + 1).toString(),
           text: 'Üzgünüm, şu anda bir sorun yaşıyorum. Lütfen daha sonra tekrar deneyin.',

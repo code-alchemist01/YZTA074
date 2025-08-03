@@ -1469,42 +1469,128 @@ Bilgi verme, öğretme amacı güden türlerdir.
     studentProfile: any;
     chatHistory?: any[];
   }): Promise<GeminiResponse> {
+    console.log('🧠 Generating mentor response for:', params.studentQuestion);
+    
+    // Rate limiting kontrolü
+    const now = Date.now();
+    const timeSinceLastRequest = now - this.lastRequestTime;
+    
+    if (timeSinceLastRequest < this.MIN_REQUEST_INTERVAL) {
+      const waitTime = this.MIN_REQUEST_INTERVAL - timeSinceLastRequest;
+      console.log(`⏳ Mentor rate limiting: ${waitTime}ms bekleniyor...`);
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+    }
+    
+    this.lastRequestTime = Date.now();
+    
     try {
       const prompt = `
-        Öğrencinin sorusuna ADHD dostu, destekleyici bir sanal rehber olarak yanıt ver:
+        Sen 8. sınıf öğrencileri için tasarlanmış uzman bir sanal rehbersin. Aşağıdaki öğrencinin sorusuna yardımcı ol:
 
-        Öğrenci Sorusu: ${params.studentQuestion}
-        Öğrenci Profili: ${JSON.stringify(params.studentProfile)}
-        ${params.chatHistory ? `Sohbet Geçmişi: ${JSON.stringify(params.chatHistory)}` : ''}
+        Öğrenci Sorusu: "${params.studentQuestion}"
+        
+        Öğrenci Bilgileri:
+        - İsim: ${params.studentProfile.firstName || 'Öğrenci'}
+        - Sınıf: ${params.studentProfile.grade || '8'}. sınıf
+        - Öğrenme Stili: ${params.studentProfile.learningStyle?.join(', ') || 'Görsel, İşitsel'}
+        ${params.studentProfile.hasADHD ? '- ADHD tanısı var' : ''}
 
-        SADECE aşağıdaki JSON formatında yanıt ver, başka hiçbir metin ekleme:
+        ${params.chatHistory && params.chatHistory.length > 0 ? 
+          `Son Sohbet: ${params.chatHistory.slice(-3).map(msg => `${msg.sender}: ${msg.text}`).join(' | ')}` : ''}
+
+        ÖNEMLİ: SADECE GEÇERLİ JSON formatında yanıt ver. Hiçbir ek metin ekleme!
+
+        JSON Formatı:
         {
-          "mentor_cevabi": "Kişiselleştirilmiş, destekleyici yanıt",
-          "ek_kaynak_onerisi": "Ek kaynak önerisi (varsa)",
-          "sonraki_etkilesim_onerisi": "Sohbeti devam ettirme önerisi"
+          "mentor_cevabi": "Kişiselleştirilmiş, sıcak ve destekleyici yanıt. ADHD dostu kısa paragraflar. Emojiler kullan. Öğrenciyi adıyla çağır.",
+          "ek_kaynak_onerisi": "Somut, uygulanabilir öneri (varsa)",
+          "sonraki_etkilesim_onerisi": "Sohbeti devam ettiren soru veya öneri"
         }
 
-        Yanıt ADHD öğrenciler için uygun, kısa ve teşvik edici olmalı.
+        Yanıt özellikleri:
+        - Sıcak, anlayışlı ve pozitif ton
+        - ADHD öğrenciler için kısa, net cümleler  
+        - Pratik öneriler ver
+        - Motivasyonu artır
+        - Emojiler kullan (📚 🎯 💪 🌟)
+        - Türkçe dil kurallarına uy
+        - 8. sınıf seviyesinde konuş
       `;
 
+      console.log('📤 Sending mentor request to Gemini API...');
       const result = await this.model.generateContent(prompt);
       const response = result.response;
       const text = response.text();
 
+      console.log('📥 Mentor response received');
+      console.log('📊 Response length:', text?.length || 0);
+
       try {
         const cleanedText = this.cleanJsonResponse(text);
         const jsonData = JSON.parse(cleanedText);
+        console.log('✅ Mentor response parsed successfully');
         return { success: true, data: jsonData };
       } catch (parseError) {
-        console.error('JSON Parse Error:', parseError);
-        console.error('Original text:', text);
-        console.error('Cleaned text:', this.cleanJsonResponse(text));
-        return { success: false, data: null, error: 'JSON parse hatası. Lütfen tekrar deneyin.' };
+        console.error('❌ Mentor JSON Parse Error:', parseError);
+        console.error('🔍 Original text sample:', text?.substring(0, 300));
+        
+        // Fallback mentor response
+        return this.generateFallbackMentorResponse(params.studentQuestion, params.studentProfile);
       }
     } catch (error) {
-      console.error('API Error:', error);
-      return { success: false, data: null, error: 'API hatası: ' + error };
+      console.error('❌ Mentor API Error:', error);
+      
+      // Fallback mentor response
+      return this.generateFallbackMentorResponse(params.studentQuestion, params.studentProfile);
     }
+  }
+
+  // Fallback mentor responses
+  private generateFallbackMentorResponse(question: string, profile: any): GeminiResponse {
+    console.log('🔄 Generating fallback mentor response');
+    
+    const name = profile.firstName || 'Arkadaşım';
+    const questionLower = question.toLowerCase();
+    
+    let mentorResponse = '';
+    let ekKaynak = '';
+    let sonrakiEtkilesim = '';
+
+    // Soru türüne göre yanıt seç
+    if (questionLower.includes('motivasyon') || questionLower.includes('isteksiz')) {
+      mentorResponse = `Merhaba ${name}! 💪 Motivasyon düşüklüğü çok normal bir durum. Önce küçük hedefler belirle ve her başarını kutla! 🌟 Çalışma sürelerini kısa tut (25 dakika) ve ara ver. Sen başarabilirsin! 🎯`;
+      ekKaynak = 'Pomodoro tekniği dene: 25 dk çalış, 5 dk ara ver';
+      sonrakiEtkilesim = 'Hangi derste motivasyon sorunu yaşıyorsun? Ona özel plan yapalım! 📚';
+    } 
+    else if (questionLower.includes('plan') || questionLower.includes('program')) {
+      mentorResponse = `Selam ${name}! 📅 Çalışma planı oluşturmak harika bir başlangıç! Önce hangi derslerde zorlandığını belirle, sonra her gün için küçük hedefler koy. 📝 ADHD için renkli planlar çok işe yarar! 🌈`;
+      ekKaynak = 'Renkli haftalık planlama takvimi kullan';
+      sonrakiEtkilesim = 'Hangi saatlerde en verimli olduğunu biliyor musun? 🕐';
+    }
+    else if (questionLower.includes('adhd') || questionLower.includes('dikkat')) {
+      mentorResponse = `Merhaba ${name}! 🧠 ADHD ile başarılı olmak mümkün! Önemli ipuçları: Çalışma ortamını düzenle, dikkat dağıtıcıları kaldır, kısa molalar ver. 🎧 Müzik de yardımcı olabilir! 💫`;
+      ekKaynak = 'Beyaz gürültü veya doğa sesleri dinle';
+      sonrakiEtkilesim = 'Hangi çalışma teknikleri sana uygun geliyor? 🤔';
+    }
+    else if (questionLower.includes('sınav') || questionLower.includes('lgs')) {
+      mentorResponse = `Hey ${name}! 📚 Sınav kaygısı normal! LGS'ye hazırlanırken: Konu konu ilerle, bol bol deneme çöz, eksiklerini tespit et. 🎯 Her gün biraz ilerlersen büyük başarılar elde edersin! 🌟`;
+      ekKaynak = 'Günlük 1 deneme sorusu çöz';
+      sonrakiEtkilesim = 'Hangi derslerde kendini güçlü hissediyorsun? 💪';
+    }
+    else {
+      mentorResponse = `Merhaba ${name}! 😊 Sorunun çok güzel! Her öğrenci farklıdır ve sen de kendine özel bir öğrenme tarzın var. 🌟 Sabrıyla ilerle, küçük adımlarla büyük hedeflere ulaşabilirsin! 💪`;
+      ekKaynak = 'Kendine güven ve sabırlı ol';
+      sonrakiEtkilesim = 'Bu konuda daha spesifik ne merak ediyorsun? 🤔';
+    }
+
+    return {
+      success: true,
+      data: {
+        mentor_cevabi: mentorResponse,
+        ek_kaynak_onerisi: ekKaynak,
+        sonraki_etkilesim_onerisi: sonrakiEtkilesim
+      }
+    };
   }
 
   async generatePerformanceAnalysis(params: {
