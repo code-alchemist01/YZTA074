@@ -314,25 +314,7 @@ const Homepage = () => {
         </div>
       </div>
 
-      {/* Sample Videos Section - Bu bölüm geri eklendi ve arka plan yazıları kaldırıldı */}
-      <div id="sample-videos" className="px-6 py-10 md:py-16 bg-white">
-        <h2 className="text-2xl md:text-4xl font-bold mb-8 text-center text-marathon-primary-blue">Örnek Ders ve Tanıtım Videoları</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 max-w-7xl mx-auto">
-          {sampleVideos.map((video, index) => (
-            <div key={index} className="bg-gray-100 rounded-xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow duration-300">
-              <div className="relative w-full h-40 bg-gray-300 flex items-center justify-center">
-                <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover" />
-                <FaPlayCircle className="absolute text-white text-5xl opacity-80 hover:opacity-100 transition-opacity" />
-              </div>
-              <div className="p-4 text-center">
-                <h3 className="text-lg font-semibold text-gray-800">{video.title}</h3>
-                <p className="text-sm text-gray-600">{video.count}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
+      
       {/* User Reviews Section */}
       <div id="comments" className="px-6 py-10 md:py-16 bg-gray-50">
         <h2 className="text-2xl md:text-4xl font-bold mb-8 text-center text-marathon-primary-blue">Kullanıcı Yorumları ve Başarılarımız</h2>
