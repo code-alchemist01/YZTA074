@@ -226,8 +226,11 @@ Geliştirilmesi Gereken Yönlerimiz
 Backend klasöründe .env dosyası oluşturduktan sonra aşağıdaki bilgileri bu dosyaya kaydedin:
 
 MYSQL_HOST=switchback.proxy.rlwy.net
+
 MYSQL_PORT=44851
+
 MYSQL_USER=root
+
 MYSQL_PASSWORD=PSuSOmKujuwJwEKqtSufugqHfgFxnTuD
 
 Daha sonra terminalinizde sırayla aşağıdaki komutları girin:
